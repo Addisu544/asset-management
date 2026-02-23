@@ -6,5 +6,6 @@
         public string GroupName { get; set; } = null!;
 
         public ICollection<AssetType> AssetTypes { get; set; } = new List<AssetType>();
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }
