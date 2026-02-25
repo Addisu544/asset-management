@@ -18,7 +18,8 @@ builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, BCryptPasswordService>();
-
+builder.Services.AddControllers();
+builder.Services.AddAuthorization();
 
 
 
@@ -82,10 +83,18 @@ if (app.Environment.IsDevelopment())
 
 
 
+//var passwordService = app.Services.CreateScope()
+//    .ServiceProvider
+//    .GetRequiredService<IPasswordService>();
 
+//var hash = passwordService.HashPassword("Test123");
+//Console.WriteLine($"Hash: {hash}");
+
+//var isValid = passwordService.VerifyPassword("Test123", hash);
+Console.WriteLine($"Valid: ");
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapControllers();
 app.Run();
 
 //record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
