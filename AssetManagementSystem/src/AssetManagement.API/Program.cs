@@ -91,7 +91,7 @@ if (app.Environment.IsDevelopment())
 //Console.WriteLine($"Hash: {hash}");
 
 //var isValid = passwordService.VerifyPassword("Test123", hash);
-Console.WriteLine($"Valid: ");
+//Console.WriteLine($"Valid: {isValid}");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

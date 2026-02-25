@@ -1,6 +1,7 @@
 ﻿using AssetManagement.API.Models.Auth;
 using AssetManagement.Application.Interfaces;
 using AssetManagement.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,6 +56,12 @@ namespace AssetManagement.API.Controllers
                 Email = employee.Email,
                 Role = employee.Role.ToString()
             });
+        }
+
+        [HttpGet("my-profile")]
+        public IActionResult GetMyProfile()
+        {
+            return Ok("Accessible by any authenticated user.");
         }
     }
 }
