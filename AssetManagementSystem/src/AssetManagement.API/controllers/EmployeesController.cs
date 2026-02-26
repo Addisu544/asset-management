@@ -7,7 +7,7 @@ using AssetManagement.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.Security.Claims;
 namespace AssetManagement.API.Controllers;
 
 [ApiController]
@@ -63,4 +63,93 @@ public class EmployeesController : ControllerBase
 
         return Ok("Employee created successfully.");
     }
+
+
+
+
+    [HttpGet]
+    [Authorize(Roles = "Manager,AssetManager")]
+    public async Task<IActionResult> GetAllEmployees()
+    {
+        var employees = await _context.Employees
+            .Select(e => new EmployeeResponse
+            {
+                Id = e.Id,
+                UserId = e.UserId,
+                FullName = e.FirstName + " " + e.LastName,
+                Email = e.Email,
+                Title = e.Title,
+                Role = e.Role.ToString(),
+                Status = e.Status.ToString()
+            })
+            .ToListAsync();
+
+        return Ok(employees);
+    }
+
+
+ 
+
+
+
+
+    [HttpGet("{id}")]
+    [Authorize(Roles = "Manager,AssetManager")]
+    public async Task<IActionResult> GetEmployeeById(int id)
+    {
+        var employee = await _context.Employees
+            .Where(e => e.Id == id)
+            .Select(e => new EmployeeResponse
+            {
+                Id = e.Id,
+                UserId = e.UserId,
+                FullName = e.FirstName + " " + e.LastName,
+                Email = e.Email,
+                Title = e.Title,
+                Role = e.Role.ToString(),
+                Status = e.Status.ToString()
+            })
+            .FirstOrDefaultAsync();
+
+        if (employee == null)
+            return NotFound("Employee not found.");
+
+        return Ok(employee);
+    }
+
+
+
+
+
+
+    [HttpGet("my-profile")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(idClaim))
+            return Unauthorized();
+
+        var employeeId = int.Parse(idClaim);
+
+        var employee = await _context.Employees
+            .Where(e => e.Id == employeeId) // now correct PK comparison
+            .Select(e => new EmployeeResponse
+            {
+                Id = e.Id,
+                UserId = e.UserId,
+                FullName = e.FirstName + " " + e.LastName,
+                Email = e.Email,
+                Title = e.Title,
+                Role = e.Role.ToString(),
+                Status = e.Status.ToString()
+            })
+            .FirstOrDefaultAsync();
+
+        if (employee == null)
+            return NotFound();
+
+        return Ok(employee);
+    }
+
 }

@@ -19,13 +19,19 @@ namespace AssetManagement.Infrastructure.Security
 
         public string GenerateToken(Employee employee)
         {
+            //var claims = new List<Claim>
+            //{
+            //    new Claim("UserId", employee.UserId),
+            //    new Claim(ClaimTypes.Email, employee.Email),
+            //    new Claim(ClaimTypes.Role, employee.Role.ToString())
+            //};
+
             var claims = new List<Claim>
             {
-                new Claim("UserId", employee.UserId),
-                new Claim(ClaimTypes.Email, employee.Email),
-                new Claim(ClaimTypes.Role, employee.Role.ToString())
+             new Claim(ClaimTypes.NameIdentifier, employee.Id.ToString()), // PK stored
+             new Claim(ClaimTypes.Email, employee.Email),
+              new Claim(ClaimTypes.Role, employee.Role.ToString())
             };
-
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
 

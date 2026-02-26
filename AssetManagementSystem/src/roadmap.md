@@ -409,3 +409,50 @@ When completed, this project demonstrates:
 This is not tutorial-level.
 
 This is job-ready system-level work.
+
+
+
+
+users
+employee
+{
+  "userId": "EMP002",
+  "firstName": "Employee",
+  "lastName": "Doe",
+  "departmentId": 1,
+  "title": "Engineer",
+  "level": "Junior",
+  "email": "Employee@test.com",
+  "phone": "123456789",
+  "password": "123456",
+  "role": "Employee"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJFTVAwMDIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJFbXBsb3llZUB0ZXN0LmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkVtcGxveWVlIiwiZXhwIjoxNzcyMDg5NDQ5LCJpc3MiOiJBc3NldE1hbmFnZW1lbnRTeXN0ZW0iLCJhdWQiOiJBc3NldE1hbmFnZW1lbnRTeXN0ZW1Vc2VycyJ9.rEf0X_SjKo8I8m-5nm2sUTSlaJGnkEa6iLWqSQes8TA
+manager
+{
+  "userId": "M001",
+  "firstName": "Manager",
+  "lastName": "Doe",
+  "departmentId": 1,
+  "title": "Engineer",
+  "level": "Junior",
+  "email": "Manager@test.com",
+  "phone": "123456789",
+  "password": "123456",
+  "role": "Manager"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJNMDAxIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiTWFuYWdlckB0ZXN0LmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6Ik1hbmFnZXIiLCJleHAiOjE3NzIwODk0NzEsImlzcyI6IkFzc2V0TWFuYWdlbWVudFN5c3RlbSIsImF1ZCI6IkFzc2V0TWFuYWdlbWVudFN5c3RlbVVzZXJzIn0.Gsi4jzw-V7JdprT0Ghbhs_SB2cBt4lFZKkGreVOOQAg
+{
+  "userId": "AM001",
+  "firstName": "AssetManager",
+  "lastName": "Doe",
+  "departmentId": 1,
+  "title": "Engineer",
+  "level": "Junior",
+  "email": "Manager@test.com",
+  "phone": "123456789",
+  "password": "123456",
+  "role": "AssetManager"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJNMDAxIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiTWFuYWdlckB0ZXN0LmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6Ik1hbmFnZXIiLCJleHAiOjE3NzIwODk1MzgsImlzcyI6IkFzc2V0TWFuYWdlbWVudFN5c3RlbSIsImF1ZCI6IkFzc2V0TWFuYWdlbWVudFN5c3RlbVVzZXJzIn0.gqmShS6-Tdu8ce0E0QT2fEobNchmh-3SjwPMrFivOjY
+
