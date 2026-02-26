@@ -83,15 +83,15 @@ if (app.Environment.IsDevelopment())
 
 
 
-//var passwordService = app.Services.CreateScope()
-//    .ServiceProvider
-//    .GetRequiredService<IPasswordService>();
+var passwordService = app.Services.CreateScope()
+    .ServiceProvider
+    .GetRequiredService<IPasswordService>();
 
-//var hash = passwordService.HashPassword("Test123");
-//Console.WriteLine($"Hash: {hash}");
+var hash = passwordService.HashPassword("Test123");
+Console.WriteLine($"Hash: {hash}");
 
-//var isValid = passwordService.VerifyPassword("Test123", hash);
-//Console.WriteLine($"Valid: {isValid}");
+var isValid = passwordService.VerifyPassword("Test123", hash);
+Console.WriteLine($"Valid: {isValid}");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

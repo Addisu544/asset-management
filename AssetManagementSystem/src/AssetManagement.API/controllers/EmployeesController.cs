@@ -152,4 +152,72 @@ public class EmployeesController : ControllerBase
         return Ok(employee);
     }
 
+
+
+
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "AssetManager")]
+    public async Task<IActionResult> UpdateEmployee(int id, UpdateEmployeeRequest request)
+    {
+        var employee = await _context.Employees.FindAsync(id);
+
+        if (employee == null)
+            return NotFound("Employee not found.");
+
+        // Update allowed fields
+        employee.FirstName = request.FirstName;
+        employee.LastName = request.LastName;
+        employee.DepartmentId = request.DepartmentId;
+        employee.Title = request.Title;
+        employee.Phone = request.Phone;
+
+        // Convert & validate enums safely
+        if (!Enum.TryParse(request.Level, out Domain.Enums.Level level))
+            return BadRequest("Invalid Level value.");
+
+        if (!Enum.TryParse(request.Role, out Domain.Enums.Role role))
+            return BadRequest("Invalid Role value.");
+
+        if (!Enum.TryParse(request.Status, out Domain.Enums.EmployeeStatus status))
+            return BadRequest("Invalid Status value.");
+
+        employee.Level = level;
+        employee.Role = role;
+        employee.Status = status;
+
+        await _context.SaveChangesAsync();
+
+        return Ok("Employee updated successfully.");
+    }
+
+
+
+
+
+
+
+
+    [HttpPatch("{id}/status")]
+    [Authorize(Roles = "AssetManager")]
+    public async Task<IActionResult> UpdateEmployeeStatus(int id, UpdateEmployeeStatusRequest request)
+    {
+        var employee = await _context.Employees.FindAsync(id);
+
+        if (employee == null)
+            return NotFound("Employee not found.");
+
+        // Validate enum safely
+        if (!Enum.TryParse(request.Status, out Domain.Enums.EmployeeStatus status))
+            return BadRequest("Invalid status value. Allowed: Active, Inactive.");
+
+        employee.Status = status;
+
+        await _context.SaveChangesAsync();
+
+        return Ok("Employee status updated successfully.");
+    }
+
+
+
 }
