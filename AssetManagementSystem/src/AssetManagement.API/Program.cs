@@ -1,9 +1,9 @@
-using AssetManagement.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using AssetManagement.Application.Interfaces;
+using AssetManagement.Infrastructure.Data;
 using AssetManagement.Infrastructure.Security;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -20,7 +20,10 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, BCryptPasswordService>();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
-
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = false;
+});
 
 
 
