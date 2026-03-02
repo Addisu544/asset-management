@@ -133,4 +133,119 @@ public class TransactionsController : ControllerBase
 
 
 
+    // ==============================
+    // 🔹 GET ALL TRANSACTIONS
+    // ==============================
+    [HttpGet]
+    [Authorize(Roles = "Manager,AssetManager")]
+    public async Task<IActionResult> GetAll()
+    {
+        var transactions = await _context.AssetTransactions
+            .Include(t => t.Employee)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetGroup)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetType)
+            .OrderByDescending(t => t.CreatedAt)
+            .Select(t => new TransactionResponse
+            {
+                Id = t.Id,
+                TransactionType = t.TransactionType.ToString(),
+                CreatedAt = t.CreatedAt,
+
+                EmployeeName = t.Employee.FirstName + " " + t.Employee.LastName,
+                EmployeeUserId = t.Employee.UserId,
+
+                ProductTagNo = t.Product.TagNo,
+                ProductBrand = t.Product.Brand,
+                GroupName = t.Product.AssetGroup.GroupName,
+                TypeName = t.Product.AssetType.TypeName,
+
+                IssuedBy = t.IssuedBy
+            })
+            .ToListAsync();
+
+        return Ok(transactions);
+    }
+
+
+
+
+
+    [HttpGet("by-employee/{employeeId}")]
+    [Authorize(Roles = "Manager,AssetManager")]
+    public async Task<IActionResult> GetByEmployee(int employeeId)
+    {
+        var transactions = await _context.AssetTransactions
+            .Where(t => t.EmployeeId == employeeId)
+            .Include(t => t.Employee)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetGroup)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetType)
+            .OrderByDescending(t => t.CreatedAt)
+            .Select(t => new TransactionResponse
+            {
+                Id = t.Id,
+                TransactionType = t.TransactionType.ToString(),
+                CreatedAt = t.CreatedAt,
+
+                EmployeeName = t.Employee.FirstName + " " + t.Employee.LastName,
+                EmployeeUserId = t.Employee.UserId,
+
+                ProductTagNo = t.Product.TagNo,
+                ProductBrand = t.Product.Brand,
+                GroupName = t.Product.AssetGroup.GroupName,
+                TypeName = t.Product.AssetType.TypeName,
+
+                IssuedBy = t.IssuedBy
+            })
+            .ToListAsync();
+
+        return Ok(transactions);
+    }
+
+
+
+
+
+    [HttpGet("by-proproduct/{productId}")]
+    [Authorize(Roles = "Manager,AssetManager")]
+    public async Task<IActionResult> GetByProduct(int productId)
+    {
+        var transactions = await _context.AssetTransactions
+            .Where(t => t.ProductId == productId)
+            .Include(t => t.Employee)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetGroup)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetType)
+            .OrderByDescending(t => t.CreatedAt)
+            .Select(t => new TransactionResponse
+            {
+                Id = t.Id,
+                TransactionType = t.TransactionType.ToString(),
+                CreatedAt = t.CreatedAt,
+
+                EmployeeName = t.Employee.FirstName + " " + t.Employee.LastName,
+                EmployeeUserId = t.Employee.UserId,
+
+                ProductTagNo = t.Product.TagNo,
+                ProductBrand = t.Product.Brand,
+                GroupName = t.Product.AssetGroup.GroupName,
+                TypeName = t.Product.AssetType.TypeName,
+
+                IssuedBy = t.IssuedBy
+            })
+            .ToListAsync();
+
+        return Ok(transactions);
+    }
+
+
+
+
+
+
+
 }
