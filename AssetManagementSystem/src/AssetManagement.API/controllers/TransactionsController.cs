@@ -71,4 +71,66 @@ public class TransactionsController : ControllerBase
 
         return Ok("Product issued successfully.");
     }
+
+
+
+
+    // ==============================
+    // 🔹 RETURN PRODUCT
+    // ==============================
+    [HttpPost("return")]
+    [Authorize(Roles = "AssetManager")]
+    public async Task<IActionResult> ReturnProduct(ReturnProductRequest request)
+    {
+        // 1️⃣ Validate Product exists
+        var product = await _context.Products
+            .FirstOrDefaultAsync(p => p.Id == request.ProductId);
+
+        if (product == null)
+            return NotFound("Product not found.");
+
+        // 2️⃣ Validate Product is Taken
+        if (product.Status != ProductStatus.Taken)
+            return BadRequest("Product is not currently taken.");
+
+        // 3️⃣ Find last Issue transaction (optional but recommended safety)
+        var lastIssue = await _context.AssetTransactions
+            .Where(t => t.ProductId == request.ProductId &&
+                        t.TransactionType == TransactionType.Issue)
+            .OrderByDescending(t => t.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (lastIssue == null)
+            return BadRequest("No issue record found for this product.");
+
+        // 4️⃣ Get logged-in AssetManager Id
+        var issuerId = int.Parse(
+            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value
+        );
+
+        // 5️⃣ Create Return transaction
+        var returnTransaction = new AssetTransaction
+        {
+            EmployeeId = lastIssue.EmployeeId, // Return from same employee
+            ProductId = product.Id,
+            TransactionType = TransactionType.Return,
+            IssuedBy = issuerId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        // 6️⃣ Update Product Status
+        product.Status = ProductStatus.Free;
+
+        _context.AssetTransactions.Add(returnTransaction);
+
+        // 7️⃣ Save once
+        await _context.SaveChangesAsync();
+
+        return Ok("Product returned successfully.");
+    }
+
+
+
+
+
 }
