@@ -92,6 +92,7 @@ Console.WriteLine($"Hash: {hash}");
 
 var isValid = passwordService.VerifyPassword("Test123", hash);
 Console.WriteLine($"Valid: {isValid}");
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
