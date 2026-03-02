@@ -14,15 +14,18 @@ namespace AssetManagement.API.Controllers
         private readonly AppDbContext _context;
         private readonly IPasswordService _passwordService;
         private readonly IJwtService _jwtService;
+        private readonly ILogger<AuthController> _logger;
 
         public AuthController(
             AppDbContext context,
             IPasswordService passwordService,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            ILogger<AuthController> logger)
         {
             _context = context;
             _passwordService = passwordService;
             _jwtService = jwtService;
+            _logger = logger;
         }
 
         [HttpPost("login")]
@@ -48,6 +51,9 @@ namespace AssetManagement.API.Controllers
 
             //  Generate JWT
             var token = _jwtService.GenerateToken(employee);
+
+            //log event
+            _logger.LogInformation("Employee {Email} successfully logged in with role {Role}.", request.Email, employee.Role.ToString());
 
             //  Return token
             return Ok(new

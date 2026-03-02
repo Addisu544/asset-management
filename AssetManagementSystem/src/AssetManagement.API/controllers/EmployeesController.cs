@@ -17,13 +17,16 @@ public class EmployeesController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IPasswordService _passwordService;
+    private readonly ILogger<EmployeesController> _logger;
 
     public EmployeesController(
         AppDbContext context,
-        IPasswordService passwordService)
+        IPasswordService passwordService,
+        ILogger<EmployeesController> logger)
     {
         _context = context;
         _passwordService = passwordService;
+        _logger = logger;
     }
 
     [HttpPost]
@@ -60,6 +63,10 @@ public class EmployeesController : ControllerBase
         // 4️⃣ Save
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync();
+
+        //log event
+        _logger.LogInformation("Employee created successfully. UserId: {UserId}, Email: {Email}, Role: {Role}",
+                           employee.UserId, employee.Email, employee.Role.ToString());
 
         return Ok("Employee created successfully.");
     }
@@ -214,6 +221,10 @@ public class EmployeesController : ControllerBase
         employee.Status = status;
 
         await _context.SaveChangesAsync();
+
+        //log event
+        _logger.LogInformation("Employee status updated successfully. Employee ID: {EmployeeId}, Status: {Status}, Email: {Email}",
+                          employee.Id, employee.Status.ToString(), employee.Email);
 
         return Ok("Employee status updated successfully.");
     }

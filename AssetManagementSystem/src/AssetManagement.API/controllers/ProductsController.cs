@@ -1,4 +1,5 @@
-﻿using AssetManagement.Domain.Entities;
+﻿using AssetManagement.API.Controllers;
+using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -12,16 +13,19 @@ using System.Security.Claims;
 public class ProductsController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<ProductsController> _logger;
 
-    public ProductsController(AppDbContext context)
+    public ProductsController(AppDbContext context, ILogger<ProductsController> logger)
     {
         _context = context;
+        _logger = logger;
+
     }
 
-    // ==============================
-    // 🔹 CREATE PRODUCT
-    // ==============================
-    [HttpPost]
+// ==============================
+// 🔹 CREATE PRODUCT
+// ==============================
+[HttpPost]
     [Authorize(Roles = "AssetManager")]
     public async Task<IActionResult> Create(CreateProductRequest request)
     {
@@ -55,6 +59,9 @@ public class ProductsController : ControllerBase
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
 
+        //log event
+        _logger.LogInformation("Product created successfully. Product ID: {ProductId}, TagNo: {TagNo}, SerialNo: {SerialNo}",
+                           product.Id, product.TagNo, product.SerialNo);
         return Ok("Product created successfully.");
     }
 
@@ -177,6 +184,10 @@ public class ProductsController : ControllerBase
 
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
+
+        //log event
+        _logger.LogInformation("Product deleted successfully. Product ID: {ProductId}, TagNo: {TagNo}, SerialNo: {SerialNo}",
+                                       product.Id, product.TagNo, product.SerialNo);
 
         return Ok("Product deleted successfully.");
     }

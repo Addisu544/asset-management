@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+//using Microsoft.Extensions.Logging;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -12,10 +13,11 @@ using System.Security.Claims;
 public class TransactionsController : ControllerBase
 {
     private readonly AppDbContext _context;
-
-    public TransactionsController(AppDbContext context)
+    private readonly ILogger<TransactionsController> _logger;
+    public TransactionsController(AppDbContext context, ILogger<TransactionsController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     // ==============================
@@ -68,6 +70,10 @@ public class TransactionsController : ControllerBase
 
         // 7️⃣ Save Changes (Single Save)
         await _context.SaveChangesAsync();
+
+        //8 log event
+        _logger.LogInformation("Product {ProductId} issued to Employee {EmployeeId} by {IssuerId}",
+    product.Id, employee.Id, issuerId);
 
         return Ok("Product issued successfully.");
     }
@@ -125,6 +131,10 @@ public class TransactionsController : ControllerBase
 
         // 7️⃣ Save once
         await _context.SaveChangesAsync();
+
+        //log event
+        _logger.LogInformation("Product {ProductId} returned by Employee {EmployeeId}",
+    product.Id, lastIssue.EmployeeId);
 
         return Ok("Product returned successfully.");
     }
