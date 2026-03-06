@@ -1,13 +1,12 @@
-import { RouterProvider } from "react-router-dom";
-import { CssBaseline, ThemeProvider } from "@mui/material";
-import { router } from "./router";
-import { theme } from "./theme";
+import AppRouter from "../routes/AppRouter";
+import { AuthProvider } from "../context/AuthContext";
 
-export default function App() {
+function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   );
 }
+
+export default App;

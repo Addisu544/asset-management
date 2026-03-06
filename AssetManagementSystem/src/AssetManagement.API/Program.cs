@@ -18,6 +18,16 @@ builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordService, BCryptPasswordService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -96,6 +106,7 @@ Console.WriteLine($"Hash: {hash}");
 var isValid = passwordService.VerifyPassword("Test123", hash);
 Console.WriteLine($"Valid: {isValid}");
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
