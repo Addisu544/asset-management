@@ -1,0 +1,805 @@
+# 🏢 Asset Management System
+
+(.NET 8 + React + Clean Architecture -- Professional Edition)
+
+---
+
+# 🚨 IMPORTANT RULES
+
+- This roadmap is **strictly sequential**
+- ✅ Data before APIs\
+- ✅ Auth before features\
+- ✅ Backend fully complete before frontend\
+- ✅ Business rules enforced at service level\
+- ❌ No skipping stages
+
+You move to the next phase only after checking all boxes.
+
+---
+
+# 🧱 PHASE 0 --- Project Foundation (Professional Setup)
+
+> Goal: Clean structure. Stable environment. No chaos later.
+
+---
+
+## 🔹 Task 0.1 -- Solution Structure
+
+- [ ] Create main solution folder: `AssetManagementSystem`
+- [ ] Create `src` folder
+- [ ] Create 4 projects:
+  - [ ] `AssetManagement.Domain`
+  - [ ] `AssetManagement.Application`
+  - [ ] `AssetManagement.Infrastructure`
+  - [ ] `AssetManagement.API`
+- [ ] Add project references properly
+- [ ] Set API as startup project
+
+✅ Confirm: - Solution builds successfully - No dependency errors
+
+---
+
+## 🔹 Task 0.2 -- Base Infrastructure Setup
+
+- [ ] Install EF Core packages
+- [ ] Install SQL Server provider
+- [ ] Install JWT packages
+- [ ] Install BCrypt
+- [ ] Install Swagger
+- [ ] Configure connection string
+- [ ] Add basic DbContext
+- [ ] Enable Swagger
+
+✅ Confirm: - API runs - Swagger loads - No DB connection errors
+
+---
+
+# 🗄 PHASE 1 --- Database Design (DATA FIRST)
+
+> Rule: Database must reflect business rules perfectly.
+
+---
+
+## 🔹 Task 1.1 -- Finalize Entities (On Paper / Whiteboard)
+
+Entities:
+
+- [ ] Employee
+- [ ] Product
+- [ ] AssetTransaction
+- [ ] AssetGroup
+- [ ] AssetType
+- [ ] Department
+
+Enums:
+
+- [ ] ProductStatus (Free/Taken)
+- [ ] EmployeeStatus (Active/Inactive)
+- [ ] Role (Employee/Manager/AssetManager)
+- [ ] Level (Junior/Intermediate/Senior)
+- [ ] TransactionType (Issue/Return)
+
+✅ Confirm: - Relationships are clear - All foreign keys defined -
+Unique constraints identified (Email, TagNo, UserId)
+
+---
+
+## 🔹 Task 1.2 -- Implement Domain Entities
+
+In `Domain` layer:
+
+- [ ] Create entity classes
+- [ ] Create enums
+- [ ] Add navigation properties
+- [ ] Add default values (status, timestamps)
+
+❌ No EF annotations\
+❌ No database logic
+
+Pure models only.
+
+---
+
+## 🔹 Task 1.3 -- Configure EF Core (Infrastructure)
+
+- [ ] Create AppDbContext
+- [ ] Add DbSets
+- [ ] Configure relationships using Fluent API
+- [ ] Configure unique indexes
+- [ ] Configure enum conversions
+- [ ] Configure timestamps
+- [ ] Add initial migration
+- [ ] Update database
+
+✅ Confirm: - Tables created in SQL Server - Constraints applied
+correctly - Foreign keys valid
+
+---
+
+# 🔐 PHASE 2 --- Authentication & Security (CRITICAL)
+
+> This phase must be solid. Everything depends on it.
+
+---
+
+## 🔹 Task 2.1 -- Password Hashing Service
+
+- [ ] Create IPasswordService interface
+- [ ] Implement BCryptPasswordService
+- [ ] Test hashing & verification manually
+
+---
+
+## 🔹 Task 2.2 -- JWT Token Service
+
+- [ ] Create IJwtService
+- [ ] Implement JWT generation
+- [ ] Include:
+  - UserId
+  - Email
+  - Role
+- [ ] Configure JWT settings in appsettings.json
+- [ ] Configure JWT authentication middleware
+
+---
+
+## 🔹 Task 2.3 -- Login Endpoint
+
+- [ ] Create AuthController
+- [ ] Implement Login
+- [ ] Validate:
+  - Email exists
+  - Password correct
+  - Status = Active
+- [ ] Return JWT
+
+Test using Postman.
+
+---
+
+## 🔹 Task 2.4 -- Authorization
+
+- [ ] Apply \[Authorize\]
+- [ ] Apply role-based authorization
+- [ ] Test:
+  - Employee access restrictions
+  - Manager access restrictions
+  - AssetManager access restrictions
+
+✅ Confirm: - Unauthorized users blocked - Inactive users cannot login -
+Role restrictions working
+
+---
+
+# 👥 PHASE 3 --- Employee Module
+
+---
+
+## 🔹 Task 3.1 -- Create Employee (AssetManager Only)
+
+- [ ] Create employee endpoint
+- [ ] Hash password
+- [ ] Default Status = Active
+- [ ] Assign Role
+- [ ] Validate unique email
+
+---
+
+## 🔹 Task 3.2 -- Get Employees
+
+- [ ] Get all employees (Manager & AssetManager)
+- [ ] Get employee by Id
+- [ ] Get current logged-in profile
+
+---
+
+## 🔹 Task 3.3 -- Update Employee
+
+- [ ] Update employee info
+- [ ] Change status (Active/Inactive)
+- [ ] Validate permissions
+
+---
+
+## 🔹 Task 3.4 -- Profile Endpoint
+
+- [ ] Get profile of logged-in user
+- [ ] Hide password
+
+✅ Confirm: - Only AssetManager can edit - Only active users allowed
+operations
+
+---
+
+# 📦 PHASE 4 --- Asset Group, Type & Department Setup
+
+> These are master data tables.
+
+---
+
+## 🔹 Task 4.1 -- Asset Groups CRUD (AssetManager)
+
+- [ ] Create
+- [ ] Get all
+- [ ] Update
+- [ ] Delete (if not referenced)
+
+---
+
+## 🔹 Task 4.2 -- Asset Types CRUD
+
+- [ ] Create under group
+- [ ] Get by group
+- [ ] Update
+- [ ] Delete
+
+---
+
+## 🔹 Task 4.3 -- Departments CRUD
+
+- [ ] Create
+- [ ] Get all
+- [ ] Update
+- [ ] Delete
+
+---
+
+# 🖥 PHASE 5 --- Product Module
+
+---
+
+## 🔹 Task 5.1 -- Create Product
+
+- [ ] Validate TagNo unique
+- [ ] Default Status = Free
+- [ ] Save image path
+- [ ] Save timestamp
+
+---
+
+## 🔹 Task 5.2 -- Get Products
+
+- [ ] Get all (Manager & AssetManager)
+- [ ] Get own assigned products
+- [ ] Include related data (Group, Type)
+
+---
+
+## 🔹 Task 5.3 -- Update Product
+
+- [ ] Edit product info
+- [ ] Validate business rules
+
+---
+
+## 🔹 Task 5.4 -- Delete Product
+
+- [ ] Allow only if Status = Free
+- [ ] Restrict otherwise
+
+✅ Confirm: - Cannot delete taken product - Cannot assign taken product
+
+---
+
+# 🔄 PHASE 6 --- Transaction System (Core Logic)
+
+> This is the heart of the system.
+
+---
+
+## 🔹 Task 6.1 -- Issue Product
+
+- [ ] Validate employee is Active
+- [ ] Validate product is Free
+- [ ] Create Issue transaction
+- [ ] Update product status → Taken
+- [ ] Save IssuedBy
+
+---
+
+## 🔹 Task 6.2 -- Return Product
+
+- [ ] Validate product is Taken
+- [ ] Create Return transaction
+- [ ] Update product status → Free
+
+---
+
+## 🔹 Task 6.3 -- Transaction Queries
+
+- [ ] Get all transactions (Manager & AssetManager)
+- [ ] Get transactions by employee
+- [ ] Get transactions by product
+- [ ] Include necessary joined fields
+
+---
+
+# 🧠 PHASE 7 --- Business Rule Hardening
+
+- [ ] Prevent double issue
+- [ ] Prevent return if not taken
+- [ ] Prevent inactive employee assignment
+- [ ] Add global exception middleware
+- [ ] Add validation handling
+- [ ] Add logging
+
+---
+
+# 🎨 PHASE 8 --- Frontend Setup (After Backend 100% Complete)
+
+# 🔵 PHASE 8.1 — Project Initialization (Foundation)
+
+## 🎯 Goal
+
+Create clean base project and global configuration.
+
+## 📋 Tasks
+
+- [ ] Create Vite + React + TS
+
+- [ ] Install dependencies:
+  - @mui/material
+  - @mui/icons-material
+  - @mui/x-data-grid
+  - axios
+  - react-router-dom
+
+- [ ] Configure MUI theme
+
+- [ ] Configure Axios instance with baseURL
+
+- [ ] Create global router file
+
+- [ ] Setup strict TypeScript settings
+
+## 📌 You must provide me:
+
+Nothing.
+
+## ✅ Output
+
+Project skeleton + theme + router + axios config.
+
+---
+
+# 🔵 PHASE 8.2 — Authentication System (Critical Core)
+
+This phase controls the entire app behavior.
+
+## 🎯 Goal
+
+Implement secure login, token storage, auto-redirect, and role-based routing.
+
+## 📋 Tasks
+
+### Login Page
+
+- [ ] Email
+
+- [ ] Password
+
+- [ ] Form validation
+
+- [ ] Show loading
+
+- [ ] Show error
+
+- [ ] Store JWT in localStorage
+
+- [ ] Decode token to extract:
+  - userId
+  - role
+  - full name
+
+### AuthContext
+
+- [ ] login()
+- [ ] logout()
+- [ ] currentUser
+- [ ] isAuthenticated
+
+### Axios Interceptor
+
+- [ ] Attach token
+
+- [ ] Handle 401 → logout automatically
+
+- [ ] ProtectedRoute component
+
+### Role-based redirect after login:
+
+- AssetManager → /dashboard
+- Manager → /dashboard
+- Employee → /user
+
+### On refresh:
+
+- [ ] If token exists → restore session
+
+## 📌 You must provide:
+
+Example login response from backend.
+
+## ✅ Output
+
+Fully working auth system.
+
+---
+
+# 🔵 PHASE 8.3 — Layout System (Topbar + Sidebar Architecture)
+
+This phase builds reusable UI shell.
+
+## 🎯 Goal
+
+Create role-aware layout system.
+
+## 📋 Tasks
+
+### Topbar (Reusable for ALL roles)
+
+Left: App icon + "Asset Management System"
+
+Right:
+
+- [ ] Avatar
+- [ ] Full name under avatar
+
+Dropdown:
+
+- Name
+- Role
+- View Profile → /profile
+- My Properties → /myproperties
+- My Transactions → /mytransactions
+
+### Sidebar (Only for AssetManager & Manager)
+
+- [ ] Collapsible
+- [ ] Active item highlight
+- [ ] Role-based items
+
+#### Asset Manager Sidebar:
+
+- Dashboard
+- Users
+- Products
+- Transactions
+- Asset Groups
+- Asset Types
+- Departments
+
+#### Manager Sidebar:
+
+- Dashboard
+
+- Users (read-only)
+
+- Products (read-only)
+
+- Transactions (read-only)
+
+- [ ] Breadcrumb system
+
+- [ ] Page title always visible
+
+- [ ] Layout wrapper component
+
+## 📌 You must provide:
+
+Nothing.
+
+## ✅ Output
+
+Fully reusable layout system.
+
+---
+
+# 🔵 PHASE 8.4 — Shared UI Infrastructure (Professional UX Core)
+
+This is very important.
+
+We build reusable UI components ONCE so every table is enterprise-level.
+
+## 📋 Components to build
+
+### DataTable wrapper (MUI DataGrid configured with):
+
+- [ ] Pagination default 10
+
+- [ ] Sorting
+
+- [ ] Sticky header
+
+- [ ] Search (client-side)
+
+- [ ] Row hover
+
+- [ ] Right-aligned actions column
+
+- [ ] Status badges
+
+- [ ] Empty state component
+
+### StatusBadge
+
+- Free → Green
+
+- Taken → Orange
+
+- Active → Green
+
+- Inactive → Gray
+
+- [ ] ConfirmDialog (Delete confirmation)
+
+- [ ] Snackbar system (global success messages)
+
+- [ ] Global error alert system
+
+- [ ] Loading spinner overlay
+
+### useApi hook
+
+- [ ] loading
+- [ ] error
+- [ ] success handling
+
+## 📌 You must provide:
+
+Nothing.
+
+## ✅ Output
+
+Reusable professional UI foundation.
+
+---
+
+# 🔵 PHASE 8.5 — Dashboard Module
+
+Since you don’t have summary API,
+We compute from:
+
+- Products
+- Employees
+- Transactions
+
+## 📋 Dashboard should show:
+
+- Total Products
+
+- Free Products
+
+- Taken Products
+
+- Total Employees
+
+- Active Employees
+
+- Total Transactions
+
+- [ ] Cards layout using MUI Grid.
+
+Visible to:
+AssetManager & Manager.
+
+Employee:
+Simple message page: "Asset Management System"
+
+## 📌 You must provide:
+
+Nothing.
+
+---
+
+# 🔵 PHASE 8.6 — Employees Module
+
+## 🎯 Goal
+
+Full CRUD for AssetManager.
+Read-only for Manager.
+
+## 📋 Pages:
+
+- Employees List
+- Create Employee
+- Edit Employee
+- View Details
+
+## 🎨 UX:
+
+- [ ] DataGrid
+- [ ] Status badge
+- [ ] Action column
+- [ ] Confirm dialog on deactivate
+- [ ] Pagination
+- [ ] Search
+
+Uses:
+
+- /api/Employees
+- /api/Employees/{id}
+- /api/Employees/{id}/status
+
+## 📌 You must provide:
+
+Nothing (we use your OpenAPI spec).
+
+---
+
+# 🔵 PHASE 8.7 — Master Data Module
+
+## 📋 Submodules:
+
+- Asset Groups
+- Asset Types
+- Departments
+
+Each:
+
+- [ ] DataGrid
+- [ ] Create
+- [ ] Edit
+- [ ] Delete
+- [ ] Confirmation dialog
+
+Note:
+AssetTypes must filter by group.
+
+## 📌 You must provide:
+
+Nothing.
+
+---
+
+# 🔵 PHASE 8.8 — Products Module
+
+## 🎯 Goal
+
+Full CRUD for AssetManager.
+Read-only for Manager.
+
+## 📋 Pages:
+
+- Products List
+- Create
+- Edit
+- View Details
+
+Extra:
+
+- [ ] Status badge
+- [ ] Image preview
+- [ ] Filtering by group
+- Cannot delete if Taken (backend handles)
+
+Uses:
+
+- /api/Products
+- /api/Products/{id}
+
+---
+
+# 🔵 PHASE 8.9 — Transactions Module
+
+## AssetManager:
+
+- Issue Product
+- Return Product
+- View transactions
+
+## Manager:
+
+- View only
+
+## 📋 Pages:
+
+- Transactions List
+- Issue Form
+- Return Form
+
+Uses:
+
+- /api/Transactions
+- /api/Transactions/issue
+- /api/Transactions/return
+- /api/Transactions/by-employee
+- /api/Transactions/by-product
+
+---
+
+# 🔵 PHASE 8.10 — User Area (Base Routes)
+
+These routes exist for ALL roles and NOT under role prefix.
+
+## 📋 Routes:
+
+- /profile
+- /myproperties
+- /mytransactions
+
+### Profile:
+
+Uses /api/Auth/my-profile
+
+### MyProperties:
+
+Use transactions to compute currently owned items
+
+### MyTransactions:
+
+Filter by logged user id
+
+Important:
+These do NOT belong under /manager or /assetmanager.
+
+---
+
+# 🔵 PHASE 8.11 — Global UX Enforcement Phase
+
+Before finishing:
+
+- [ ] All API calls show spinner
+- [ ] All success show Snackbar
+- [ ] All delete require confirm
+- [ ] All tables paginated
+- [ ] All enums use colored badge
+- [ ] Breadcrumb on every page
+- [ ] Token expiration auto logout
+- [ ] No console logs in production
+- [ ] Protected routes on refresh
+- [ ] Accessibility labels
+
+---
+
+# 🔵 PHASE 9 — Final Professionalization
+
+- [ ] Add seed instructions
+- [ ] Add README
+- [ ] Add ER diagram
+- [ ] Add screenshots
+- [ ] Clean folder structure
+- [ ] Deploy backend + frontend
+
+users
+employee
+{
+"userId": "EMP002",
+"firstName": "Employee",
+"lastName": "Doe",
+"departmentId": 1,
+"title": "Engineer",
+"level": "Junior",
+"email": "Employee@test.com",
+"phone": "123456789",
+"password": "123456",
+"role": "Employee"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjE3IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiRW1wbG95ZWVAdGVzdC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJFbXBsb3llZSIsImV4cCI6NDE3NzI0MjQyNTQsImlzcyI6IkFzc2V0TWFuYWdlbWVudFN5c3RlbSIsImF1ZCI6IkFzc2V0TWFuYWdlbWVudFN5c3RlbVVzZXJzIn0.ujrY6Pxg1Q7uilK2REP50CEeXqOjgdygpAbYc_ax8F4
+manager
+{
+"userId": "M001",
+"firstName": "Manager",
+"lastName": "Doe",
+"departmentId": 1,
+"title": "Engineer",
+"level": "Junior",
+"email": "Manager@test.com",
+"phone": "123456789",
+"password": "123456",
+"role": "Manager"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjE4IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiTWFuYWdlckB0ZXN0LmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6Ik1hbmFnZXIiLCJleHAiOjQxNzcyNDI0MzU2LCJpc3MiOiJBc3NldE1hbmFnZW1lbnRTeXN0ZW0iLCJhdWQiOiJBc3NldE1hbmFnZW1lbnRTeXN0ZW1Vc2VycyJ9.PYhfbVc_a46J88tVoCexpPZwbdu-22N0VqF6M3m342I
+{
+"userId": "AM001",
+"firstName": "AssetManager",
+"lastName": "Doe",
+"departmentId": 1,
+"title": "Engineer",
+"level": "Junior",
+"email": "Manager@test.com",
+"phone": "123456789",
+"password": "123456",
+"role": "AssetManager"
+}
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIzIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiQXNzZXRNYW5hZ2VyQHRlc3QuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQXNzZXRNYW5hZ2VyIiwiZXhwIjo0MTc3MjQyNDM3MywiaXNzIjoiQXNzZXRNYW5hZ2VtZW50U3lzdGVtIiwiYXVkIjoiQXNzZXRNYW5hZ2VtZW50U3lzdGVtVXNlcnMifQ.fH2MbNTyiWzUa7-FJrfF8-77acNAshnKcSD2zLPYNIw
