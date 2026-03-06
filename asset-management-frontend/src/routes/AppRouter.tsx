@@ -39,7 +39,9 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
-import Dashboard from "../pages/Dashboard";
+// import Dashboard from "../pages/Dashboard";
+import Dashboard from "../components/dashboard/Dashboard";
+
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRouter = () => {

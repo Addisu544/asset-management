@@ -4,7 +4,7 @@ import { Typography } from "@mui/material";
 const Dashboard = () => {
   return (
     <MainLayout>
-      <Typography variant="h4">Dashboard</Typography>
+      <Typography variant="h4">Dashboard Page</Typography>
     </MainLayout>
   );
 };

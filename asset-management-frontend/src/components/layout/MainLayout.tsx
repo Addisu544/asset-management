@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import BreadcrumbsNav from "./BreadcrumbsNav";
+// import BreadcrumbsNav from "./BreadcrumbsNav";
 
 const MainLayout = ({ children }: any) => {
   return (
@@ -12,7 +12,7 @@ const MainLayout = ({ children }: any) => {
         <Topbar />
 
         <Box sx={{ p: 3 }}>
-          <BreadcrumbsNav />
+          {/* <BreadcrumbsNav /> */}
 
           {children}
         </Box>
