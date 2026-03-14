@@ -49,7 +49,7 @@ import DepartmentsPage from "../pages/masterdata/DepartmentsPage";
 import ProductsPage from "../pages/products/ProductsPage";
 import ProductFormDialog from "../pages/products/ProductFormDialog";
 import ProductDetailsDialog from "../pages/products/ProductDetailsDialog";
-
+import TransactionPage from "../pages/transactions/TransactionPage";
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -66,6 +66,7 @@ const AppRouter = () => {
         <Route path="/departments" element={<ProductFormDialog />} />
         <Route path="/departments" element={<ProductDetailsDialog />} />
 
+        <Route path="/transactions" element={<TransactionPage />} />
         <Route
           path="/dashboard"
           element={
