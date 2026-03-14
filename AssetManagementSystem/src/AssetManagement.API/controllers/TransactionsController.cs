@@ -121,7 +121,8 @@ public class TransactionsController : ControllerBase
             ProductId = product.Id,
             TransactionType = TransactionType.Return,
             IssuedBy = issuerId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+             ReturnedAt = DateTime.UtcNow
         };
 
         // 6️⃣ Update Product Status

@@ -17,5 +17,6 @@ namespace AssetManagement.Domain.Entities
         public int IssuedBy { get; set; } // AssetManager Id
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? ReturnedAt { get; set; }
     }
 }
