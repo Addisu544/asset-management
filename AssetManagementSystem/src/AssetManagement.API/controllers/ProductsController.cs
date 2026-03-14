@@ -128,6 +128,47 @@ public class ProductsController : ControllerBase
     //    return Ok(products);
     //}
 
+
+
+    // ==============================
+    // 🔹 GET CURRENTLY OWNED PRODUCTS BY EMPLOYEE
+    // ==============================
+    [HttpGet("my-products")]
+    //[Authorize(Roles = "Employee")]
+    public async Task<IActionResult> GetMyProducts()
+    {
+        // Get the logged-in user's employee ID
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        // Get the products that are currently owned by the logged-in employee (where returnedAt is null)
+        var products = await _context.AssetTransactions
+            .Where(t => t.EmployeeId == userId && t.TransactionType == TransactionType.Issue && t.Product.Status == ProductStatus.Taken)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetType)
+            .Include(t => t.Product)
+                .ThenInclude(p => p.AssetGroup)
+            .Select(t => new ProductResponse
+            {
+                Id = t.Product.Id,
+                TagNo = t.Product.TagNo,
+                GroupName = t.Product.AssetGroup.GroupName,
+                TypeName = t.Product.AssetType.TypeName,
+                Brand = t.Product.Brand,
+                Cost = t.Product.Cost,
+                SerialNo = t.Product.SerialNo,
+                Status = t.Product.Status.ToString(),
+                ImagePath = t.Product.ImagePath,
+                StockedAt = t.Product.StockedAt,
+                CreatedAt = t.Product.CreatedAt
+            })
+            .ToListAsync();
+
+        // Return the list of products
+        return Ok(products);
+    }
+
+
+
     //// ==============================
     //// 🔹 UPDATE PRODUCT
     //// ==============================
