@@ -52,22 +52,22 @@ public class AssetTypesController : ControllerBase
 
 
 
-    //// 🔹 GET ALL
-    //[HttpGet]
-    //public async Task<IActionResult> GetAll()
-    //{
-    //    var types = await _context.AssetTypes
-    //        .Select(t => new AssetTypeResponse
-    //        {
-    //            Id = t.Id,
-    //            TypeName = t.TypeName,
-    //            AssetGroupId = t.GroupId,
-    //            GroupName = t.AssetGroup.GroupName
-    //        })
-    //        .ToListAsync();
+    // 🔹 GET ALL
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var types = await _context.AssetTypes
+            .Select(t => new AssetTypeResponse
+            {
+                Id = t.Id,
+                TypeName = t.TypeName,
+                AssetGroupId = t.GroupId,
+                GroupName = t.AssetGroup.GroupName
+            })
+            .ToListAsync();
 
-    //    return Ok(types);
-    //}
+        return Ok(types);
+    }
 
     // 🔹 GET by group
     [HttpGet("by-group/{groupId}")]
