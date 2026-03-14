@@ -41,8 +41,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 // import Dashboard from "../pages/Dashboard";
 import Dashboard from "../components/dashboard/Dashboard";
-
+import EmployeesPage from "../pages/employees/EmployeesPage";
 import ProtectedRoute from "./ProtectedRoute";
+import AssetGroupsPage from "../pages/masterdata/AssetGroupsPage";
+import AssetTypesPage from "../pages/masterdata/AssetTypesPage";
+import DepartmentsPage from "../pages/masterdata/DepartmentsPage";
+import ProductsPage from "../pages/products/ProductsPage";
+import ProductFormDialog from "../pages/products/ProductFormDialog";
+import ProductDetailsDialog from "../pages/products/ProductDetailsDialog";
 
 const AppRouter = () => {
   return (
@@ -51,6 +57,14 @@ const AppRouter = () => {
         <Route path="/" element={<Login />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/users" element={<EmployeesPage />} />
+        <Route path="/asset-groups" element={<AssetGroupsPage />} />
+        <Route path="/asset-types" element={<AssetTypesPage />} />
+        <Route path="/departments" element={<DepartmentsPage />} />
+
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/departments" element={<ProductFormDialog />} />
+        <Route path="/departments" element={<ProductDetailsDialog />} />
 
         <Route
           path="/dashboard"

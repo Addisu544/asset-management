@@ -50,6 +50,25 @@ public class AssetTypesController : ControllerBase
         return Ok("Asset type created successfully.");
     }
 
+
+
+    //// 🔹 GET ALL
+    //[HttpGet]
+    //public async Task<IActionResult> GetAll()
+    //{
+    //    var types = await _context.AssetTypes
+    //        .Select(t => new AssetTypeResponse
+    //        {
+    //            Id = t.Id,
+    //            TypeName = t.TypeName,
+    //            AssetGroupId = t.GroupId,
+    //            GroupName = t.AssetGroup.GroupName
+    //        })
+    //        .ToListAsync();
+
+    //    return Ok(types);
+    //}
+
     // 🔹 GET by group
     [HttpGet("by-group/{groupId}")]
     public async Task<IActionResult> GetByGroup(int groupId)
