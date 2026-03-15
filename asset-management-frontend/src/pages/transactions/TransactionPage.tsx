@@ -7,7 +7,7 @@ import ReturnProductDialog from "./ReturnProductDialog";
 import { transactionService } from "../../services/transactionService";
 import { useAuth } from "../../context/AuthContext";
 
-const TransactionsPage = () => {
+const MyTransactionsPage = () => {
   const { currentUser } = useAuth();
 
   const [transactions, setTransactions] = useState([]);
@@ -105,4 +105,4 @@ const TransactionsPage = () => {
   );
 };
 
-export default TransactionsPage;
+export default MyTransactionsPage;

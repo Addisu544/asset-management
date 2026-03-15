@@ -101,7 +101,7 @@ public class EmployeesController : ControllerBase
 
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Manager,AssetManager")]
+    //[Authorize(Roles = "Manager,AssetManager")]
     public async Task<IActionResult> GetEmployeeById(int id)
     {
         var employee = await _context.Employees

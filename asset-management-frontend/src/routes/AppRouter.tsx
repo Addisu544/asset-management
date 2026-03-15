@@ -50,6 +50,11 @@ import ProductsPage from "../pages/products/ProductsPage";
 import ProductFormDialog from "../pages/products/ProductFormDialog";
 import ProductDetailsDialog from "../pages/products/ProductDetailsDialog";
 import TransactionPage from "../pages/transactions/TransactionPage";
+
+import ProfilePage from "../pages/user/ProfilePage";
+import MyTransactionsPage from "../pages/user/MyTransactionsPage";
+import MyPropertiesPage from "../pages/user/MyPropertiesPage";
+
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -67,6 +72,11 @@ const AppRouter = () => {
         <Route path="/departments" element={<ProductDetailsDialog />} />
 
         <Route path="/transactions" element={<TransactionPage />} />
+
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/my-transactions" element={<MyTransactionsPage />} />
+        <Route path="/my-properties" element={<MyPropertiesPage />} />
+
         <Route
           path="/dashboard"
           element={
