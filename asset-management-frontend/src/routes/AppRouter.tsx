@@ -74,8 +74,8 @@ const AppRouter = () => {
         <Route path="/transactions" element={<TransactionPage />} />
 
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/my-transactions" element={<MyTransactionsPage />} />
-        <Route path="/my-properties" element={<MyPropertiesPage />} />
+        <Route path="/mytransactions" element={<MyTransactionsPage />} />
+        <Route path="/myproperties" element={<MyPropertiesPage />} />
 
         <Route
           path="/dashboard"

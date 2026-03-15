@@ -69,7 +69,7 @@ public class ProductsController : ControllerBase
     // 🔹 GET ALL (Manager & AssetManager)
     // ==============================
     [HttpGet]
-    [Authorize(Roles = "Manager,AssetManager")]
+    //[Authorize(Roles = "Manager,AssetManager")]
     public async Task<IActionResult> GetAll()
     {
         var products = await _context.Products

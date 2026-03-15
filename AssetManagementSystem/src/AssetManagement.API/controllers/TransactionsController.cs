@@ -184,7 +184,7 @@ public class TransactionsController : ControllerBase
 
 
     [HttpGet("by-employee/{employeeId}")]
-    [Authorize(Roles = "Manager,AssetManager")]
+    //[Authorize(Roles = "Manager,AssetManager")]
     public async Task<IActionResult> GetByEmployee(int employeeId)
     {
         var transactions = await _context.AssetTransactions
