@@ -3,9 +3,9 @@ import { Typography } from "@mui/material";
 
 const Dashboard = () => {
   return (
-    <MainLayout>
+    // <MainLayout>
       <Typography variant="h4">Dashboard Page</Typography>
-    </MainLayout>
+    {/* </MainLayout> */}
   );
 };
 

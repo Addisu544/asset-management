@@ -54,14 +54,22 @@ import TransactionPage from "../pages/transactions/TransactionPage";
 import ProfilePage from "../pages/user/ProfilePage";
 import MyTransactionsPage from "../pages/user/MyTransactionsPage";
 import MyPropertiesPage from "../pages/user/MyPropertiesPage";
-
+import MainLayout from "../components/layout/MainLayout";
+import LayoutWrapper from "../components/layout/LayoutWrapper";
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-
         <Route path="/login" element={<Login />} />
+
+<Route
+          element={
+            <ProtectedRoute>
+              <LayoutWrapper />
+            </ProtectedRoute>
+          }
+        >
         <Route path="/users" element={<EmployeesPage />} />
         <Route path="/asset-groups" element={<AssetGroupsPage />} />
         <Route path="/asset-types" element={<AssetTypesPage />} />
@@ -80,11 +88,12 @@ const AppRouter = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Dashboard />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
+                </Route>
       </Routes>
     </BrowserRouter>
   );

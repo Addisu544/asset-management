@@ -58,11 +58,11 @@ const Dashboard = () => {
   // Employee role view
   if (currentUser?.role === "Employee") {
     return (
-      <MainLayout>
+      // <MainLayout>
         <Box sx={{ textAlign: "center", mt: 10 }}>
           <Typography variant="h4">Asset Management System</Typography>
         </Box>
-      </MainLayout>
+      // </MainLayout>
       // <h1>aa</h1>
     );
   }
@@ -94,7 +94,6 @@ const Dashboard = () => {
   const totalTransactions = transactions.length;
 
   return (
-    <MainLayout>
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>
           Dashboard
@@ -142,7 +141,6 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       </Box>
-    </MainLayout>
   );
 };
 
