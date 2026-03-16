@@ -51,9 +51,9 @@ const ProductsPage = () => {
 
     { field: "brand", headerName: "Brand", flex: 1 },
 
-    { field: "assetGroupName", headerName: "Group", flex: 1 },
+    { field: "groupName", headerName: "Group", flex: 1 },
 
-    { field: "assetTypeName", headerName: "Type", flex: 1 },
+    { field: "typeName", headerName: "Type", flex: 1 },
 
     {
       field: "status",
