@@ -17,9 +17,9 @@ const ProductDetailsDialog = ({ open, onClose, product }: any) => {
       <DialogContent>
         <Typography>Tag No: {product.tagNo}</Typography>
 
-        <Typography>Group: {product.assetGroupName}</Typography>
+        <Typography>Group: {product.groupName}</Typography>
 
-        <Typography>Type: {product.assetTypeName}</Typography>
+        <Typography>Type: {product.typeName}</Typography>
 
         <Typography>Brand: {product.brand}</Typography>
 
