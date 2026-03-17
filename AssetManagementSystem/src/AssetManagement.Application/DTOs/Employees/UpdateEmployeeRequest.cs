@@ -10,4 +10,9 @@ public class UpdateEmployeeRequest
     public string Phone { get; set; } = default!;
     public string Role { get; set; } = default!;
     public string Status { get; set; } = default!; // Active / Inactive
+
+    public string Email { get; set; } = default!;
+
+    public string UserId { get; set; } = default!;
+
 }

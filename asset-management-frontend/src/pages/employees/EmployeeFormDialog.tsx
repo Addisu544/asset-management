@@ -1,85 +1,3 @@
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   TextField,
-//   Button,
-// } from "@mui/material";
-// import { useState, useEffect } from "react";
-
-// interface Props {
-//   open: boolean;
-//   onClose: () => void;
-//   onSubmit: (data: any) => void;
-//   employee?: any;
-// }
-
-// const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
-//   const [form, setForm] = useState({
-//     fullName: "",
-//     email: "",
-//   });
-
-//   useEffect(() => {
-//     if (employee) {
-//       setForm({
-//         fullName: employee.fullName,
-//         email: employee.email,
-//       });
-//     }
-//   }, [employee]);
-
-//   const handleChange = (e: any) => {
-//     setForm({
-//       ...form,
-//       [e.target.name]: e.target.value,
-//     });
-//   };
-
-//   const handleSubmit = () => {
-//     onSubmit(form);
-//   };
-
-//   return (
-//     <Dialog open={open} onClose={onClose} fullWidth>
-//       <DialogTitle>
-//         {employee ? "Edit Employee" : "Create Employee"}
-//       </DialogTitle>
-
-//       <DialogContent>
-//         <TextField
-//           fullWidth
-//           margin="normal"
-//           label="Full Name"
-//           name="fullName"
-//           value={form.fullName}
-//           onChange={handleChange}
-//         />
-
-//         <TextField
-//           fullWidth
-//           margin="normal"
-//           label="Email"
-//           name="email"
-//           value={form.email}
-//           onChange={handleChange}
-//         />
-//       </DialogContent>
-
-//       <DialogActions>
-//         <Button onClick={onClose}>Cancel</Button>
-
-//         <Button variant="contained" onClick={handleSubmit}>
-//           Save
-//         </Button>
-//       </DialogActions>
-//     </Dialog>
-//   );
-// };
-
-// export default EmployeeFormDialog;
-
 import {
   Dialog,
   DialogTitle,
@@ -89,6 +7,7 @@ import {
   Button,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+import { departmentService } from "../../services/departmentService";
 
 interface Props {
   open: boolean;
@@ -107,7 +26,12 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
     phone: "",
     role: "",
     status: "Active",
+    email: "",
+    Password: "",
+    userId: "",
   });
+
+  const [departments, setDepartments] = useState<any[]>([]);
 
   useEffect(() => {
     if (employee) {
@@ -116,20 +40,41 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
       setForm({
         firstName: names[0] || "",
         lastName: names.slice(1).join(" ") || "",
-        departmentId: employee.departmentId || 1,
+        departmentId: employee.departmentId || "",
         title: employee.title || "",
         level: employee.level || "",
         phone: employee.phone || "",
         role: employee.role || "",
         status: employee.status || "Active",
+        email: employee.email || "",
+        Password: employee.Password || "",
+        userId: employee.userId || "",
       });
     }
   }, [employee]);
 
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      const res = await departmentService.getAll();
+      setDepartments(res.data);
+    };
+
+    fetchDepartments();
+  }, []);
+
+  // const handleChange = (e: any) => {
+  //   setForm({
+  //     ...form,
+  //     [e.target.name]: e.target.value,
+  //   });
+  // };
+
   const handleChange = (e: any) => {
+    const { name, value } = e.target;
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: name === "departmentId" ? Number(value) : value,
     });
   };
 
@@ -152,6 +97,44 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
           value={form.firstName}
           onChange={handleChange}
         />
+
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Email"
+          name="Email"
+          value={form.email}
+          onChange={handleChange}
+        />
+
+        <TextField
+          fullWidth
+          margin="normal"
+          label="UserId"
+          name="UserId"
+          value={form.userId}
+          onChange={handleChange}
+        />
+
+        {/* <TextField
+          fullWidth
+          margin="normal"
+          label="Password"
+          name="Password"
+          value={form.Password}
+          onChange={handleChange}
+        /> */}
+
+        {employee ? null : (
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Password"
+            name="Password"
+            value={form.Password}
+            onChange={handleChange}
+          />
+        )}
 
         <TextField
           fullWidth
@@ -181,15 +164,22 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
         />
 
         <TextField
+          select
           fullWidth
           margin="normal"
           label="Level"
           name="level"
           value={form.level}
           onChange={handleChange}
-        />
+          SelectProps={{ native: true }}
+        >
+          <option value=""></option>
+          <option value="Junior">Junior</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Senior">Senior</option>
+        </TextField>
 
-        <TextField
+        {/* <TextField
           fullWidth
           margin="normal"
           label="Department ID"
@@ -197,7 +187,26 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
           type="number"
           value={form.departmentId}
           onChange={handleChange}
-        />
+        /> */}
+
+        <TextField
+          select
+          fullWidth
+          margin="normal"
+          label="Department"
+          name="departmentId"
+          value={form.departmentId}
+          onChange={handleChange}
+          SelectProps={{ native: true }}
+        >
+          <option value=""></option>
+
+          {departments.map((dept) => (
+            <option key={dept.id} value={dept.id}>
+              {dept.name}
+            </option>
+          ))}
+        </TextField>
 
         <TextField
           select

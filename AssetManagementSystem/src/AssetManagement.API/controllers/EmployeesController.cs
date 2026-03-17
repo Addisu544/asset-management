@@ -181,7 +181,8 @@ public class EmployeesController : ControllerBase
         employee.DepartmentId = request.DepartmentId;
         employee.Title = request.Title;
         employee.Phone = request.Phone;
-
+        employee.UserId = request.UserId;
+        employee.Email = request.Email;
         // Convert & validate enums safely
         if (!Enum.TryParse(request.Level, out Domain.Enums.Level level))
             return BadRequest("Invalid Level value.");
