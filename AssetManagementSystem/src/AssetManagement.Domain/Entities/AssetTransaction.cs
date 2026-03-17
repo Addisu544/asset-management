@@ -15,7 +15,7 @@ namespace AssetManagement.Domain.Entities
         public TransactionType TransactionType { get; set; }
 
         public int IssuedBy { get; set; } // AssetManager Id
-
+        public Employee IssuedByEmployee { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReturnedAt { get; set; }
     }

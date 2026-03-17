@@ -157,6 +157,7 @@ public class TransactionsController : ControllerBase
                 .ThenInclude(p => p.AssetGroup)
             .Include(t => t.Product)
                 .ThenInclude(p => p.AssetType)
+                .Include(t => t.IssuedByEmployee)
             .OrderByDescending(t => t.CreatedAt)
             .Select(t => new TransactionResponse
             {
@@ -172,7 +173,7 @@ public class TransactionsController : ControllerBase
                 GroupName = t.Product.AssetGroup.GroupName,
                 TypeName = t.Product.AssetType.TypeName,
 
-                IssuedBy = t.IssuedBy
+                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName
             })
             .ToListAsync();
 
@@ -209,7 +210,7 @@ public class TransactionsController : ControllerBase
                 GroupName = t.Product.AssetGroup.GroupName,
                 TypeName = t.Product.AssetType.TypeName,
 
-                IssuedBy = t.IssuedBy
+                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName
             })
             .ToListAsync();
 
@@ -246,7 +247,7 @@ public class TransactionsController : ControllerBase
                 GroupName = t.Product.AssetGroup.GroupName,
                 TypeName = t.Product.AssetType.TypeName,
 
-                IssuedBy = t.IssuedBy
+                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName
             })
             .ToListAsync();
 

@@ -86,6 +86,16 @@ namespace AssetManagement.Infrastructure.Data
             // -------------------------------
             // AssetTransaction
             // -------------------------------
+            //modelBuilder.Entity<AssetTransaction>(entity =>
+            //{
+            //    entity.HasKey(t => t.Id);
+
+            //    entity.Property(t => t.TransactionType)
+            //          .HasConversion<int>();
+
+            //    entity.Property(t => t.CreatedAt)
+            //          .HasDefaultValueSql("GETUTCDATE()");
+            //});
             modelBuilder.Entity<AssetTransaction>(entity =>
             {
                 entity.HasKey(t => t.Id);
@@ -95,6 +105,18 @@ namespace AssetManagement.Infrastructure.Data
 
                 entity.Property(t => t.CreatedAt)
                       .HasDefaultValueSql("GETUTCDATE()");
+
+                // 🔹 Employee who receives the asset
+                entity.HasOne(t => t.Employee)
+                      .WithMany(e => e.Transactions)
+                      .HasForeignKey(t => t.EmployeeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // 🔹 Employee who issued the asset (IMPORTANT)
+                entity.HasOne(t => t.IssuedByEmployee)
+                      .WithMany() // no navigation collection needed
+                      .HasForeignKey(t => t.IssuedBy)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             // -------------------------------

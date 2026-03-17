@@ -12,5 +12,5 @@
     public string GroupName { get; set; } = null!;
     public string TypeName { get; set; } = null!;
 
-    public int IssuedBy { get; set; }
+    public string IssuedBy { get; set; }
 }
