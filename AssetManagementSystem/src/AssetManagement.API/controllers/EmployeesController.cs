@@ -86,6 +86,9 @@ public class EmployeesController : ControllerBase
                 FullName = e.FirstName + " " + e.LastName,
                 Email = e.Email,
                 Title = e.Title,
+                Phone= e.Phone,
+                DepartmentName = e.Department.DepartmentName,
+                Level = e.Level.ToString(),
                 Role = e.Role.ToString(),
                 Status = e.Status.ToString()
             })
