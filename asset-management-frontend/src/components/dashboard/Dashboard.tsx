@@ -3,7 +3,7 @@ import { Box, Grid, Typography, CircularProgress } from "@mui/material";
 import DashboardCard from "./DashboardCard";
 import { useApi } from "../../hooks/useApi";
 import { useAuth } from "../../context/AuthContext";
-import MainLayout from "../layout/MainLayout";
+// import MainLayout from "../layout/MainLayout";
 
 interface Product {
   id: number;

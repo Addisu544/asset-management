@@ -67,7 +67,7 @@ const AssetTypesPage = () => {
     { field: "typeName", headerName: "Type Name", flex: 1 },
 
     {
-      field: "assetGroupName",
+      field: "groupName",
       headerName: "Group",
       flex: 1,
     },

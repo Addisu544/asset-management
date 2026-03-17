@@ -1,19 +1,26 @@
+
 import { Box } from "@mui/material";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-// import BreadcrumbsNav from "./BreadcrumbsNav";
 
 const MainLayout = ({ children }: any) => {
+  const [open, setOpen] = useState(true);
+
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      
+      {/* 🔹 TOPBAR (FULL WIDTH) */}
+      <Topbar open={open} setOpen={setOpen} />
 
-      <Box sx={{ flex: 1 }}>
-        <Topbar />
+      {/* 🔹 BODY */}
+      <Box sx={{ display: "flex", flexGrow: 1 }}>
+        
+        {/* Sidebar */}
+        <Sidebar open={open} setOpen={setOpen} />
 
-        <Box sx={{ p: 3 }}>
-          {/* <BreadcrumbsNav /> */}
-
+        {/* Content */}
+        <Box sx={{ flexGrow: 1, p: 3 }}>
           {children}
         </Box>
       </Box>

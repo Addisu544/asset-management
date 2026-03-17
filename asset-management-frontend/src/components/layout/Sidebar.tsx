@@ -1,12 +1,22 @@
-import { useState } from "react";
-import { Drawer, List, ListItemButton, ListItemText } from "@mui/material";
+
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  IconButton,
+  Box,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-const Sidebar = () => {
+const drawerWidth = 240;
+
+const Sidebar = ({ open, setOpen }: any) => {
   const { currentUser } = useAuth();
   const location = useLocation();
-  const [open] = useState(true);
 
   if (currentUser?.role === "Employee") return null;
 
@@ -31,20 +41,50 @@ const Sidebar = () => {
     currentUser?.role === "AssetManager" ? assetManagerItems : managerItems;
 
   return (
-    <Drawer variant="permanent" open={open}>
-      <List sx={{ width: 240 }}>
-        {menu.map((item) => (
-          <ListItemButton
-            key={item.path}
-            component={Link}
-            to={item.path}
-            selected={location.pathname === item.path}
-          >
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
-      </List>
-    </Drawer>
+    <>
+      {/* 🔹 Open Button */}
+      {!open && (
+        <IconButton
+          onClick={() => setOpen(true)}
+          sx={{ position: "fixed", top: 21, left: 10, zIndex: 1300 }}
+        >
+          <MenuIcon />
+        </IconButton>
+      )}
+
+      <Drawer
+        variant="persistent"
+        open={open}
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
+        }}
+      >
+        {/* 🔹 Close Button */}
+        <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
+          <IconButton onClick={() => setOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <List>
+          {menu.map((item) => (
+            <ListItemButton
+              key={item.path}
+              component={Link}
+              to={item.path}
+              selected={location.pathname === item.path}
+            >
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          ))}
+        </List>
+      </Drawer>
+    </>
   );
 };
 
