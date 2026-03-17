@@ -59,11 +59,23 @@ const EmployeeDetailsDialog = ({ open, onClose, employee }: Props) => {
         </Typography>
 
         <Typography gutterBottom>
+          <strong>Phone Number:</strong> {employee.phone}
+        </Typography>
+
+        <Typography gutterBottom>
           <strong>Title:</strong> {employee.title}
         </Typography>
 
         <Typography gutterBottom>
+          <strong>Department:</strong> {employee.departmentName}
+        </Typography>
+        
+        <Typography gutterBottom>
           <strong>Role:</strong> {employee.role}
+        </Typography>
+
+        <Typography gutterBottom>
+          <strong>Level:</strong> {employee.level}
         </Typography>
 
         <Typography gutterBottom>
