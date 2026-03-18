@@ -107,6 +107,7 @@ var isValid = passwordService.VerifyPassword("Test123", hash);
 Console.WriteLine($"Valid: {isValid}");
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowFrontend");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

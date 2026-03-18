@@ -117,7 +117,10 @@ const ProductsPage = () => {
         <Button
           variant="contained"
           sx={{ mb: 2 }}
-          onClick={() => setOpenForm(true)}
+          onClick={() => {
+            setSelected(null); //  RESET
+            setOpenForm(true);
+          }}
         >
           Create Product
         </Button>

@@ -1,12 +1,13 @@
 ﻿using AssetManagement.API.Controllers;
+using AssetManagement.API.Models;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -27,7 +28,7 @@ public class ProductsController : ControllerBase
 // ==============================
 [HttpPost]
     [Authorize(Roles = "AssetManager")]
-    public async Task<IActionResult> Create(CreateProductRequest request)
+    public async Task<IActionResult> Create(CreateProductFormRequest request)
     {
         if (await _context.Products.AnyAsync(p => p.TagNo == request.TagNo))
             return BadRequest("Tag number already exists.");
@@ -42,13 +43,35 @@ public class ProductsController : ControllerBase
         if (!typeValid)
             return BadRequest("Invalid group/type combination.");
 
+
+        string? imagePath = null;
+
+        if (request.Image != null)
+        {
+            var folderPath = Path.Combine("wwwroot/images/products");
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(request.Image.FileName);
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await request.Image.CopyToAsync(stream);
+            }
+
+            imagePath = $"images/products/{fileName}";
+        }
+
+
         var product = new Product
         {
             TagNo = request.TagNo,
             AssetGroupId = request.AssetGroupId,
             AssetTypeId = request.AssetTypeId,
             StockedAt = request.StockedAt,
-            ImagePath = request.ImagePath,
+            ImagePath = imagePath,
             Brand = request.Brand,
             Cost = request.Cost,
             SerialNo = request.SerialNo,
@@ -172,9 +195,45 @@ public class ProductsController : ControllerBase
     //// ==============================
     //// 🔹 UPDATE PRODUCT
     //// ==============================
+    //[HttpPut("{id}")]
+    //[Authorize(Roles = "AssetManager")]
+    //public async Task<IActionResult> Update(int id, UpdateProductRequest request)
+    //{
+    //    var product = await _context.Products.FindAsync(id);
+
+    //    if (product == null)
+    //        return NotFound("Product not found.");
+
+    //    if (product.Status == ProductStatus.Taken)
+    //        return BadRequest("Cannot edit a taken product.");
+
+    //    //if (await _context.Products
+    //    //    .AnyAsync(p => p.SerialNo == request.SerialNo && p.Id != id))
+    //    //    return BadRequest("Serial number already exists.");
+
+    //    var typeValid = await _context.AssetTypes
+    //        .AnyAsync(t => t.Id == request.AssetTypeId &&
+    //                       t.GroupId == request.AssetGroupId);
+
+    //    if (!typeValid)
+    //        return BadRequest("Invalid group/type combination.");
+
+    //    product.AssetGroupId = request.AssetGroupId;
+    //    product.AssetTypeId = request.AssetTypeId;
+    //    product.StockedAt = request.StockedAt;
+    //    product.ImagePath = request.ImagePath;
+    //    product.Brand = request.Brand;
+    //    product.Cost = request.Cost;
+    //    product.SerialNo = request.SerialNo;
+
+    //    await _context.SaveChangesAsync();
+
+    //    return Ok("Product updated successfully.");
+    //}
+
     [HttpPut("{id}")]
     [Authorize(Roles = "AssetManager")]
-    public async Task<IActionResult> Update(int id, UpdateProductRequest request)
+    public async Task<IActionResult> Update(int id, [FromForm] UpdateProductFormRequest request)
     {
         var product = await _context.Products.FindAsync(id);
 
@@ -184,10 +243,6 @@ public class ProductsController : ControllerBase
         if (product.Status == ProductStatus.Taken)
             return BadRequest("Cannot edit a taken product.");
 
-        //if (await _context.Products
-        //    .AnyAsync(p => p.SerialNo == request.SerialNo && p.Id != id))
-        //    return BadRequest("Serial number already exists.");
-
         var typeValid = await _context.AssetTypes
             .AnyAsync(t => t.Id == request.AssetTypeId &&
                            t.GroupId == request.AssetGroupId);
@@ -195,18 +250,52 @@ public class ProductsController : ControllerBase
         if (!typeValid)
             return BadRequest("Invalid group/type combination.");
 
+        //  HANDLE IMAGE UPDATE
+        if (request.Image != null)
+        {
+            var folderPath = Path.Combine("wwwroot/images/products");
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            //  DELETE OLD IMAGE
+            if (!string.IsNullOrEmpty(product.ImagePath))
+            {
+                var oldPath = Path.Combine("wwwroot", product.ImagePath);
+
+                if (System.IO.File.Exists(oldPath))
+                    System.IO.File.Delete(oldPath);
+            }
+
+            //  SAVE NEW IMAGE
+            var fileName = Guid.NewGuid() + Path.GetExtension(request.Image.FileName);
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await request.Image.CopyToAsync(stream);
+            }
+
+            product.ImagePath = $"images/products/{fileName}";
+        }
+      
+
+        //   UPDATE OTHER FIELDS
         product.AssetGroupId = request.AssetGroupId;
         product.AssetTypeId = request.AssetTypeId;
         product.StockedAt = request.StockedAt;
-        product.ImagePath = request.ImagePath;
         product.Brand = request.Brand;
         product.Cost = request.Cost;
         product.SerialNo = request.SerialNo;
 
         await _context.SaveChangesAsync();
-
+        _logger.LogInformation("Product updated successfully. Product ID: {ProductId}, TagNo: {TagNo}, SerialNo: {SerialNo}",
+                                  product.Id, product.TagNo, product.SerialNo);
         return Ok("Product updated successfully.");
     }
+
+
+
 
     //// ==============================
     //// 🔹 DELETE PRODUCT
@@ -222,6 +311,21 @@ public class ProductsController : ControllerBase
 
         if (product.Status == ProductStatus.Taken)
             return BadRequest("Cannot delete a taken product.");
+
+
+        // delete safely
+        if (!string.IsNullOrEmpty(product.ImagePath))
+        {
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", product.ImagePath);
+
+            if (System.IO.File.Exists(fullPath))
+            {
+                System.IO.File.Delete(fullPath);
+            }
+            //if not exist, just ignore and continue with deletion
+        }
+
+
 
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
