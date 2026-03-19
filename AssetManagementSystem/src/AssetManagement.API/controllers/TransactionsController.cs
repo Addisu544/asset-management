@@ -173,7 +173,8 @@ public class TransactionsController : ControllerBase
                 GroupName = t.Product.AssetGroup.GroupName,
                 TypeName = t.Product.AssetType.TypeName,
 
-                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName
+                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName,
+                ProductImagePath = t.Product.ImagePath
             })
             .ToListAsync();
 
@@ -210,7 +211,8 @@ public class TransactionsController : ControllerBase
                 GroupName = t.Product.AssetGroup.GroupName,
                 TypeName = t.Product.AssetType.TypeName,
 
-                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName
+                IssuedBy = t.IssuedByEmployee.FirstName + " " + t.IssuedByEmployee.LastName,
+                ProductImagePath = t.Product.ImagePath
             })
             .ToListAsync();
 

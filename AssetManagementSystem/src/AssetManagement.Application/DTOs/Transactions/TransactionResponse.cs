@@ -13,4 +13,6 @@
     public string TypeName { get; set; } = null!;
 
     public string IssuedBy { get; set; }
+
+    public string? ProductImagePath { get; set; }
 }

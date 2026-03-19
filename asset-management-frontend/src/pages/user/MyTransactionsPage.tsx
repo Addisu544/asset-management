@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
+import { Button } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import StatusBadge from "../../components/common/StatusBadge";
 import { userService } from "../../services/userService";
 import { useAuth } from "../../context/AuthContext";
+import TransactionDetailsDialog from "../transactions/TransactionDetailsDialog";
 
 const MyTransactionsPage = () => {
   const { currentUser } = useAuth();
 
   const [transactions, setTransactions] = useState([]);
-
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [openView, setOpenView] = useState(false);
   const fetchTransactions = async () => {
     // const res = await userService.getMyTransactions(currentUser?.id);
     const res = await userService.getMyTransactions(
@@ -46,9 +49,34 @@ const MyTransactionsPage = () => {
       flex: 1,
       renderCell: (params: any) => new Date(params.value).toLocaleString(),
     },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 120,
+      renderCell: (params: any) => (
+        <Button
+          size="small"
+          onClick={() => {
+            setSelectedTransaction(params.row);
+            setOpenView(true);
+          }}
+        >
+          View
+        </Button>
+      ),
+    },
   ];
 
-  return <DataTable rows={transactions} columns={columns} />;
+  return (
+    <>
+      <DataTable rows={transactions} columns={columns} />;
+      <TransactionDetailsDialog
+        open={openView}
+        onClose={() => setOpenView(false)}
+        transaction={selectedTransaction}
+      />
+    </>
+  );
 };
 
 export default MyTransactionsPage;

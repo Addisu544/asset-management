@@ -6,6 +6,7 @@ import IssueProductDialog from "./IssueProductDialog";
 import ReturnProductDialog from "./ReturnProductDialog";
 import { transactionService } from "../../services/transactionService";
 import { useAuth } from "../../context/AuthContext";
+import TransactionDetailsDialog from "./TransactionDetailsDialog";
 
 const MyTransactionsPage = () => {
   const { currentUser } = useAuth();
@@ -19,7 +20,8 @@ const MyTransactionsPage = () => {
     const res = await transactionService.getAll();
     setTransactions(res.data);
   };
-
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [openView, setOpenView] = useState(false);
   useEffect(() => {
     fetchTransactions();
   }, []);
@@ -64,6 +66,22 @@ const MyTransactionsPage = () => {
       headerName: "Date",
       flex: 1,
     },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 120,
+      renderCell: (params: any) => (
+        <Button
+          size="small"
+          onClick={() => {
+            setSelectedTransaction(params.row);
+            setOpenView(true);
+          }}
+        >
+          View
+        </Button>
+      ),
+    },
   ];
 
   return (
@@ -100,6 +118,11 @@ const MyTransactionsPage = () => {
         open={openReturn}
         onClose={() => setOpenReturn(false)}
         onSubmit={handleReturn}
+      />
+      <TransactionDetailsDialog
+        open={openView}
+        onClose={() => setOpenView(false)}
+        transaction={selectedTransaction}
       />
     </Box>
   );
