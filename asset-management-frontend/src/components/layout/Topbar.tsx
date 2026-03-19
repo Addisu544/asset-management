@@ -12,7 +12,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Topbar = () => {
-  const { currentUser, logout } = useAuth();
+  // const { currentUser, logout } = useAuth();
+  const { profile, logout } = useAuth();
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -36,18 +37,29 @@ const Topbar = () => {
         <Typography variant="h6">Asset Management System</Typography>
 
         <Box>
-          <Avatar sx={{ cursor: "pointer" }} onClick={handleOpen}>
-            {currentUser?.email?.[0].toUpperCase()}
+          {/* <Avatar sx={{ cursor: "pointer" }} onClick={handleOpen}>
+            {profile?.email?.[0].toUpperCase()}
+          </Avatar> */}
+          <Avatar
+            sx={{ cursor: "pointer" }}
+            onClick={handleOpen}
+            src={
+              profile?.imagePath
+                ? `http://localhost:5055/${profile.imagePath}`
+                : ""
+            }
+          >
+            {/* fallback letter */}
+            {!profile?.imagePath && profile?.email?.[0]?.toUpperCase()}
           </Avatar>
-
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem disabled>{currentUser?.email}</MenuItem>
+            <MenuItem disabled>{profile?.email}</MenuItem>
 
-            <MenuItem disabled>{currentUser?.role}</MenuItem>
+            <MenuItem disabled>{profile?.role}</MenuItem>
 
             <MenuItem onClick={() => navigate("/profile")}>
               View Profile

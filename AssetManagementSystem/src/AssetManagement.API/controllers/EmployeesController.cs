@@ -209,7 +209,8 @@ public class EmployeesController : ControllerBase
                 Email = e.Email,
                 Title = e.Title,
                 Role = e.Role.ToString(),
-                Status = e.Status.ToString()
+                Status = e.Status.ToString(),
+                ImagePath = e.ImagePath
             })
             .FirstOrDefaultAsync();
 

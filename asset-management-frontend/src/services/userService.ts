@@ -2,6 +2,7 @@ import axios from "../api/axios";
 
 export const userService = {
   getProfile: (id: number) => axios.get(`/employees/${id}`),
+  getMyProfile: () => axios.get("/employees/my-profile"),
 
   getMyProducts: () => axios.get("/products/my-products"),
 
