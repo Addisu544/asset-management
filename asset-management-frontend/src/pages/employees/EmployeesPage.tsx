@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Box } from "@mui/material";
+import { Button, Box, Avatar } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import StatusBadge from "../../components/common/StatusBadge";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
@@ -19,7 +19,6 @@ const EmployeesPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
-
 
   const fetchEmployees = async () => {
     const res = await employeeService.getAll();
@@ -41,200 +40,125 @@ const EmployeesPage = () => {
     setOpenForm(false);
     fetchEmployees();
   };
-const handleToggleStatus = async () => {
-  if (!selectedEmployee) return;
-  const newStatus = selectedEmployee.status === "Active" ? "Inactive" : "Active";
-  await employeeService.changeStatus(selectedEmployee.id, { status: newStatus });
-  setConfirmOpen(false);
-  fetchEmployees();
-};
-  // const handleDeactivate = async () => {
-  //   await employeeService.changeStatus(selectedEmployee.id);
-  //   setConfirmOpen(false);
-  //   fetchEmployees();
-  // };
-//  <Button
-//   size="small"
-//   color={toggleColor}
-//   onClick={() => {
-//     setSelectedEmployee(employee);
-//     setConfirmOpen(true);
-//   }}
-// >
-//   {toggleLabel}
-// </Button>
+  const handleToggleStatus = async () => {
+    if (!selectedEmployee) return;
+    const newStatus =
+      selectedEmployee.status === "Active" ? "Inactive" : "Active";
+    await employeeService.changeStatus(selectedEmployee.id, {
+      status: newStatus,
+    });
+    setConfirmOpen(false);
+    fetchEmployees();
+  };
 
+  // 🔹 Columns definition
+  const columns = [
+    {
+      field: "image",
+      headerName: "Profile",
+      width: 100,
+      sortable: false,
+      renderCell: (params: any) => {
+        const employee = params.row;
 
-
-// 🔹 Columns definition
-const columns = [
-  { field: "userId", headerName: "User ID", width: 120 },
-  { field: "fullName", headerName: "Name", flex: 1 },
-  { field: "email", headerName: "Email", flex: 1 },
-  { field: "title", headerName: "Title", width: 160 },
-  {
-    field: "role",
-    headerName: "Role",
-    width: 150,
-    renderCell: (params: any) => <StatusBadge status={params.value} />,
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    width: 150,
-    renderCell: (params: any) => <StatusBadge status={params.value} />,
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 250,
-    renderCell: (params: any) => {
-      const employee = params.row;
-      const isActive = employee.status === "Active";
-      const toggleLabel = isActive ? "Deactivate" : "Activate";
-      const toggleColor = isActive ? "error" : "success";
-
-      return (
-        <Box>
-          <Button
-            size="small"
-            onClick={() => {
-              setSelectedEmployee(employee);
-              setOpenDetails(true);
-            }}
-          >
-            View
-          </Button>
-
-          {currentUser?.role === "AssetManager" && (
-            <>
-              <Button
-                size="small"
-                onClick={() => {
-                  setSelectedEmployee(employee);
-                  setOpenForm(true);
-                }}
-              >
-                Edit
-              </Button>
-
-              <Button
-                size="small"
-                color={toggleColor}
-                onClick={() => {
-                  setSelectedEmployee(employee);
-                  setConfirmOpen(true);
-                }}
-              >
-                {toggleLabel}
-              </Button>
-            </>
-          )}
-        </Box>
-      );
+        return (
+          <Avatar
+            src={
+              employee.imagePath
+                ? `http://localhost:5055/${employee.imagePath}`
+                : ""
+            }
+            alt={employee.fullName}
+            sx={{ width: 40, height: 40 }}
+          />
+        );
+      },
     },
-  },
-];
+    { field: "userId", headerName: "User ID", width: 120 },
+    { field: "fullName", headerName: "Name", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "title", headerName: "Title", width: 160 },
+    {
+      field: "role",
+      headerName: "Role",
+      width: 150,
+      renderCell: (params: any) => <StatusBadge status={params.value} />,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      renderCell: (params: any) => <StatusBadge status={params.value} />,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 250,
+      renderCell: (params: any) => {
+        const employee = params.row;
+        const isActive = employee.status === "Active";
+        const toggleLabel = isActive ? "Deactivate" : "Activate";
+        const toggleColor = isActive ? "error" : "success";
 
+        return (
+          <Box>
+            <Button
+              size="small"
+              onClick={() => {
+                setSelectedEmployee(employee);
+                setOpenDetails(true);
+              }}
+            >
+              View
+            </Button>
 
+            {currentUser?.role === "AssetManager" && (
+              <>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setSelectedEmployee(employee);
+                    setOpenForm(true);
+                  }}
+                >
+                  Edit
+                </Button>
 
-
-
-
-
-//   const columns = [
-//     { field: "userId", headerName: "User ID", width: 120 },
-
-//     { field: "fullName", headerName: "Name", flex: 1 },
-
-//     { field: "email", headerName: "Email", flex: 1 },
-
-//     { field: "title", headerName: "Title", width: 160 },
-
-//     {
-//       field: "role",
-//       headerName: "Role",
-//       width: 150,
-//       renderCell: (params: any) => <StatusBadge status={params.value} />,
-//     },
-
-//     {
-//       field: "status",
-//       headerName: "Status",
-//       width: 150,
-//       renderCell: (params: any) => <StatusBadge status={params.value} />,
-//     },
-
-//     {
-//       field: "actions",
-//       headerName: "Actions",
-//       width: 250,
-//       renderCell: (params: any) => {
-//         const employee = params.row;
-// const isActive = employee.status === "Active"; // current status
-//     const toggleLabel = isActive ? "Deactivate" : "Activate";
-//     const toggleColor = isActive ? "error" : "success";
-//         return (
-//           <Box>
-//             <Button
-//               size="small"
-//               onClick={() => {
-//                 setSelectedEmployee(employee);
-//                 setOpenDetails(true);
-//               }}
-//             >
-//               View
-//             </Button>
-
-//             {currentUser?.role === "AssetManager" && (
-//               <>
-//                 <Button
-//                   size="small"
-//                   onClick={() => {
-//                     setSelectedEmployee(employee);
-//                     setOpenForm(true);
-//                   }}
-//                 >
-//                   Edit
-//                 </Button>
-
-//                 {/* <Button
-//                   size="small"
-//                   color="error"
-//                   onClick={() => {
-//                     setSelectedEmployee(employee);
-//                     setConfirmOpen(true);
-//                   }}
-//                 >
-//                   Deactivate
-//                 </Button> */}
-
-//            <Button
-//   size="small"
-//   color={toggleColor}
-//   onClick={() => {
-//     setSelectedEmployee(employee);
-//     setConfirmOpen(true);
-//   }}
-// >
-//   {toggleLabel}
-// </Button>
-
-//               </>
-//             )}
-//           </Box>
-//         );
-//       },
-//     },
-//   ];
+                <Button
+                  size="small"
+                  color={toggleColor}
+                  onClick={() => {
+                    setSelectedEmployee(employee);
+                    setConfirmOpen(true);
+                  }}
+                >
+                  {toggleLabel}
+                </Button>
+              </>
+            )}
+          </Box>
+        );
+      },
+    },
+  ];
 
   return (
     <Box>
       {currentUser?.role === "AssetManager" && (
+        // <Button
+        //   variant="contained"
+        //   sx={{ mb: 2 }}
+        //   onClick={() => setOpenForm(true)}
+        // >
+        //   Create Employee
+        // </Button>
         <Button
           variant="contained"
           sx={{ mb: 2 }}
-          onClick={() => setOpenForm(true)}
+          onClick={() => {
+            setSelectedEmployee(null); // ✅ VERY IMPORTANT
+            setOpenForm(true);
+          }}
         >
           Create Employee
         </Button>
@@ -262,18 +186,17 @@ const columns = [
         title="Deactivate Employee"
         message="Are you sure?"
       /> */}
-          <ConfirmDialog
-      open={confirmOpen}
-      onClose={() => setConfirmOpen(false)}
-      onConfirm={handleToggleStatus}
-      title={
-        selectedEmployee?.status === "Active"
-          ? "Deactivate Employee"
-          : "Activate Employee"
-      }
-      message="Are you sure?"
-    />
-
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleToggleStatus}
+        title={
+          selectedEmployee?.status === "Active"
+            ? "Deactivate Employee"
+            : "Activate Employee"
+        }
+        message="Are you sure?"
+      />
     </Box>
   );
 };

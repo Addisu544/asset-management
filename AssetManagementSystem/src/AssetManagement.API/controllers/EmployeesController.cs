@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using AssetManagement.API.Models;
 namespace AssetManagement.API.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,21 +31,78 @@ public class EmployeesController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost]
-    [Authorize(Roles = "AssetManager")] // Only AssetManager can create
-    public async Task<IActionResult> CreateEmployee(CreateEmployeeRequest request)
-    {
-        // 1️⃣ Validate unique email
-        var emailExists = await _context.Employees
-            .AnyAsync(e => e.Email == request.Email);
+    //[HttpPost]
+    //[Authorize(Roles = "AssetManager")] // Only AssetManager can create
+    //public async Task<IActionResult> CreateEmployee(CreateEmployeeRequest request)
+    //{
+    //    // 1️⃣ Validate unique email
+    //    var emailExists = await _context.Employees
+    //        .AnyAsync(e => e.Email == request.Email);
 
+    //    if (emailExists)
+    //        return BadRequest("Email already exists.");
+
+    //    // 2️⃣ Hash password
+    //    var passwordHash = _passwordService.HashPassword(request.Password);
+
+    //    // 3️⃣ Map DTO → Entity
+    //    var employee = new Employee
+    //    {
+    //        UserId = request.UserId,
+    //        FirstName = request.FirstName,
+    //        LastName = request.LastName,
+    //        DepartmentId = request.DepartmentId,
+    //        Title = request.Title,
+    //        Level = Enum.Parse<Level>(request.Level),
+    //        Email = request.Email,
+    //        Phone = request.Phone,
+    //        PasswordHash = passwordHash,
+    //        Role = Enum.Parse<Role>(request.Role),
+    //        Status = EmployeeStatus.Active, // Default rule
+    //        CreatedAt = DateTime.UtcNow
+    //    };
+
+    //    // 4️⃣ Save
+    //    _context.Employees.Add(employee);
+    //    await _context.SaveChangesAsync();
+
+    //    //log event
+    //    _logger.LogInformation("Employee created successfully. UserId: {UserId}, Email: {Email}, Role: {Role}",
+    //                       employee.UserId, employee.Email, employee.Role.ToString());
+
+    //    return Ok("Employee created successfully.");
+    //}
+
+
+
+    [HttpPost]
+    [Authorize(Roles = "AssetManager")]
+    public async Task<IActionResult> CreateEmployee([FromForm] CreateEmployeeRequest request)
+    {
+        var emailExists = await _context.Employees.AnyAsync(e => e.Email == request.Email);
         if (emailExists)
             return BadRequest("Email already exists.");
 
-        // 2️⃣ Hash password
         var passwordHash = _passwordService.HashPassword(request.Password);
 
-        // 3️⃣ Map DTO → Entity
+        string? imagePath = null;
+
+        //   SAVE IMAGE
+        if (request.Image != null)
+        {
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/employees");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(request.Image.FileName);
+            var filePath = Path.Combine(folder, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await request.Image.CopyToAsync(stream);
+
+            imagePath = $"uploads/employees/{fileName}";
+        }
+
         var employee = new Employee
         {
             UserId = request.UserId,
@@ -56,20 +115,17 @@ public class EmployeesController : ControllerBase
             Phone = request.Phone,
             PasswordHash = passwordHash,
             Role = Enum.Parse<Role>(request.Role),
-            Status = EmployeeStatus.Active, // Default rule
-            CreatedAt = DateTime.UtcNow
+            ImagePath = imagePath // ✅ SET
         };
 
-        // 4️⃣ Save
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync();
 
-        //log event
-        _logger.LogInformation("Employee created successfully. UserId: {UserId}, Email: {Email}, Role: {Role}",
-                           employee.UserId, employee.Email, employee.Role.ToString());
-
         return Ok("Employee created successfully.");
     }
+
+
+
 
 
 
@@ -90,7 +146,8 @@ public class EmployeesController : ControllerBase
                 DepartmentName = e.Department.DepartmentName,
                 Level = e.Level.ToString(),
                 Role = e.Role.ToString(),
-                Status = e.Status.ToString()
+                Status = e.Status.ToString(),
+                ImagePath = e.ImagePath
             })
             .ToListAsync();
 
@@ -166,43 +223,91 @@ public class EmployeesController : ControllerBase
 
 
 
+    //[HttpPut("{id}")]
+    //[Authorize(Roles = "AssetManager")]
+    //public async Task<IActionResult> UpdateEmployee(int id, UpdateEmployeeRequest request)
+    //{
+    //    var employee = await _context.Employees.FindAsync(id);
+
+    //    if (employee == null)
+    //        return NotFound("Employee not found.");
+
+    //    // Update allowed fields
+    //    employee.FirstName = request.FirstName;
+    //    employee.LastName = request.LastName;
+    //    employee.DepartmentId = request.DepartmentId;
+    //    employee.Title = request.Title;
+    //    employee.Phone = request.Phone;
+    //    employee.UserId = request.UserId;
+    //    employee.Email = request.Email;
+    //    // Convert & validate enums safely
+    //    if (!Enum.TryParse(request.Level, out Domain.Enums.Level level))
+    //        return BadRequest("Invalid Level value.");
+
+    //    if (!Enum.TryParse(request.Role, out Domain.Enums.Role role))
+    //        return BadRequest("Invalid Role value.");
+
+    //    if (!Enum.TryParse(request.Status, out Domain.Enums.EmployeeStatus status))
+    //        return BadRequest("Invalid Status value.");
+
+    //    employee.Level = level;
+    //    employee.Role = role;
+    //    employee.Status = status;
+
+    //    await _context.SaveChangesAsync();
+
+    //    return Ok("Employee updated successfully.");
+    //}
+
     [HttpPut("{id}")]
     [Authorize(Roles = "AssetManager")]
-    public async Task<IActionResult> UpdateEmployee(int id, UpdateEmployeeRequest request)
+    public async Task<IActionResult> UpdateEmployee(int id, [FromForm] UpdateEmployeeRequest request)
     {
         var employee = await _context.Employees.FindAsync(id);
-
         if (employee == null)
             return NotFound("Employee not found.");
 
-        // Update allowed fields
+        // ✅ IMAGE REPLACEMENT
+        if (request.Image != null)
+        {
+            // delete old image (if exists)
+            if (!string.IsNullOrEmpty(employee.ImagePath))
+            {
+                var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", employee.ImagePath);
+                if (System.IO.File.Exists(oldPath))
+                    System.IO.File.Delete(oldPath);
+            }
+
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/employees");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(request.Image.FileName);
+            var filePath = Path.Combine(folder, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await request.Image.CopyToAsync(stream);
+
+            employee.ImagePath = $"uploads/employees/{fileName}";
+        }
+
+        // update fields
         employee.FirstName = request.FirstName;
         employee.LastName = request.LastName;
         employee.DepartmentId = request.DepartmentId;
         employee.Title = request.Title;
         employee.Phone = request.Phone;
-        employee.UserId = request.UserId;
         employee.Email = request.Email;
-        // Convert & validate enums safely
-        if (!Enum.TryParse(request.Level, out Domain.Enums.Level level))
-            return BadRequest("Invalid Level value.");
+        employee.UserId = request.UserId;
 
-        if (!Enum.TryParse(request.Role, out Domain.Enums.Role role))
-            return BadRequest("Invalid Role value.");
-
-        if (!Enum.TryParse(request.Status, out Domain.Enums.EmployeeStatus status))
-            return BadRequest("Invalid Status value.");
-
-        employee.Level = level;
-        employee.Role = role;
-        employee.Status = status;
+        employee.Level = Enum.Parse<Level>(request.Level);
+        employee.Role = Enum.Parse<Role>(request.Role);
+        employee.Status = Enum.Parse<EmployeeStatus>(request.Status);
 
         await _context.SaveChangesAsync();
 
         return Ok("Employee updated successfully.");
     }
-
-
 
 
 

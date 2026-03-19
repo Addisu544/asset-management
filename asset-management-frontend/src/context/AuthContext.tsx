@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: any) => {
 
     if (token) {
       const user = decodeToken(token);
+      console.log("decoded user info is", user);
       setCurrentUser(user);
     }
   }, []);

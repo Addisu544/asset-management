@@ -12,4 +12,5 @@ public class EmployeeResponse
     public string Level { get; set; } = default!;
     public string Phone { get; set; } = default!;
     public string DepartmentName { get; set; } = default!;
+    public string? ImagePath { get; set; }
 }

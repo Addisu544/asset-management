@@ -23,6 +23,7 @@ namespace AssetManagement.Domain.Entities
         public string PasswordHash { get; set; } = null!;
 
         public Role Role { get; set; }
+        public string? ImagePath { get; set; }
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Active;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

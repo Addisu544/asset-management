@@ -1,6 +1,6 @@
 ﻿namespace AssetManagement.Application.DTOs.Employees;
 
-public class CreateEmployeeRequest
+public class CreateEmployeesRequest
 {
     public string UserId { get; set; } = default!;
     public string FirstName { get; set; } = default!;

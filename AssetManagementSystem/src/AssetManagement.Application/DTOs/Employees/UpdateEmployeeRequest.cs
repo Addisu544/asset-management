@@ -1,6 +1,6 @@
 ﻿namespace AssetManagement.Application.DTOs.Employees;
 
-public class UpdateEmployeeRequest
+public class UpdateEmployeesRequest
 {
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
