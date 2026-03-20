@@ -6,6 +6,7 @@ import {
   Menu,
   MenuItem,
   Box,
+  Button,
 } from "@mui/material";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -35,11 +36,17 @@ const Topbar = () => {
     <AppBar position="static">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6">Asset Management System</Typography>
-
+        <Button color="error" onClick={() => navigate("/myproperties")}>
+          My Properties
+        </Button>
+        <Button color="error" onClick={() => navigate("/mytransactions")}>
+          My Transactions
+        </Button>
         <Box>
           {/* <Avatar sx={{ cursor: "pointer" }} onClick={handleOpen}>
             {profile?.email?.[0].toUpperCase()}
           </Avatar> */}
+
           <Avatar
             sx={{ cursor: "pointer" }}
             onClick={handleOpen}
@@ -65,13 +72,13 @@ const Topbar = () => {
               View Profile
             </MenuItem>
 
-            <MenuItem onClick={() => navigate("/myproperties")}>
+            {/* <MenuItem onClick={() => navigate("/myproperties")}>
               My Properties
             </MenuItem>
 
             <MenuItem onClick={() => navigate("/mytransactions")}>
               My Transactions
-            </MenuItem>
+            </MenuItem> */}
 
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
