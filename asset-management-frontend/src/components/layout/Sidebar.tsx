@@ -4,86 +4,178 @@ import {
   List,
   ListItemButton,
   ListItemText,
-  IconButton,
+  ListItemIcon,
+  Toolbar,
   Box,
+  Typography,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import CategoryIcon from "@mui/icons-material/Category";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import DomainIcon from "@mui/icons-material/Domain";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const drawerWidth = 240;
 
-const Sidebar = ({ open, setOpen }: any) => {
+const Sidebar = ({
+  isMobile,
+  open,
+  onClose,
+}: {
+  isMobile: boolean;
+  open: boolean;
+  onClose: () => void;
+}) => {
   const { currentUser } = useAuth();
   const location = useLocation();
 
   if (currentUser?.role === "Employee") return null;
 
   const assetManagerItems = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Users", path: "/users" },
-    { label: "Products", path: "/products" },
-    { label: "Transactions", path: "/transactions" },
-    { label: "Asset Groups", path: "/asset-groups" },
-    { label: "Asset Types", path: "/asset-types" },
-    { label: "Departments", path: "/departments" },
+    { label: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
+    { label: "Users", path: "/users", icon: <PeopleIcon /> },
+    { label: "Products", path: "/products", icon: <Inventory2Icon /> },
+    {
+      label: "Transactions",
+      path: "/transactions",
+      icon: <CompareArrowsIcon />,
+    },
+    {
+      label: "Asset Groups",
+      path: "/asset-groups",
+      icon: <CategoryIcon />,
+    },
+    {
+      label: "Asset Types",
+      path: "/asset-types",
+      icon: <AccountTreeIcon />,
+    },
+    {
+      label: "Departments",
+      path: "/departments",
+      icon: <DomainIcon />,
+    },
   ];
 
   const managerItems = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Users", path: "/users" },
-    { label: "Products", path: "/products" },
-    { label: "Transactions", path: "/transactions" },
+    { label: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
+    { label: "Users", path: "/users", icon: <PeopleIcon /> },
+    { label: "Products", path: "/products", icon: <Inventory2Icon /> },
+    {
+      label: "Transactions",
+      path: "/transactions",
+      icon: <CompareArrowsIcon />,
+    },
   ];
 
   const menu =
     currentUser?.role === "AssetManager" ? assetManagerItems : managerItems;
 
-  return (
-    <>
-      {/* 🔹 Open Button */}
-      {!open && (
-        <IconButton
-          onClick={() => setOpen(true)}
-          sx={{ position: "fixed", top: 21, left: 10, zIndex: 1300 }}
-        >
-          <MenuIcon />
-        </IconButton>
-      )}
+  const drawerContent = (
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Matches Topbar height alignment */}
+      <Toolbar />
 
-      <Drawer
-        variant="persistent"
-        open={open}
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
-        {/* 🔹 Close Button */}
-        <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
-          <IconButton onClick={() => setOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
+      <Box sx={{ px: 2, pb: 1 }}>
+        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700 }}>
+          NAVIGATION
+        </Typography>
+      </Box>
 
-        <List>
-          {menu.map((item) => (
+      <List sx={{ pt: 0 }}>
+        {menu.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
             <ListItemButton
               key={item.path}
               component={Link}
               to={item.path}
-              selected={location.pathname === item.path}
+              selected={isActive}
+              onClick={isMobile ? onClose : undefined}
+              sx={{
+                mx: 1,
+                my: 0.5,
+                borderRadius: 2,
+                px: 2,
+                "&.Mui-selected": {
+                  bgcolor: "action.selected",
+                  "& .MuiListItemIcon-root": { color: "primary.main" },
+                },
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              }}
             >
-              <ListItemText primary={item.label} />
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isActive ? "primary.main" : "text.secondary",
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.label}
+                primaryTypographyProps={{
+                  fontWeight: isActive ? 700 : 500,
+                }}
+              />
             </ListItemButton>
-          ))}
-        </List>
-      </Drawer>
+          );
+        })}
+      </List>
+    </Box>
+  );
+
+  return (
+    <>
+      {isMobile ? (
+        <Drawer
+          variant="temporary"
+          open={open}
+          onClose={onClose}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      ) : (
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              overflowX: "hidden",
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
     </>
   );
 };
