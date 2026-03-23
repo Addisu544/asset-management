@@ -484,6 +484,9 @@ import {
   TextField,
   MenuItem,
   Box,
+  Paper,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { assetGroupService } from "../../services/assetGroupService";
@@ -492,7 +495,17 @@ import { assetTypeService } from "../../services/assetTypeService";
 type AssetGroup = { id: number; groupName: string };
 type AssetType = { id: number; typeName: string; assetGroupId: number };
 
-const ProductFormDialog = ({ open, onClose, onSubmit, product }: any) => {
+const ProductFormDialog = ({
+  open = false,
+  onClose = () => {},
+  onSubmit = async () => {},
+  product,
+}: {
+  open?: boolean;
+  onClose?: () => void;
+  onSubmit?: (data: FormData) => Promise<any> | any;
+  product?: any;
+}) => {
   const [groups, setGroups] = useState<AssetGroup[]>([]);
   const [types, setTypes] = useState<AssetType[]>([]);
 
@@ -510,6 +523,8 @@ const ProductFormDialog = ({ open, onClose, onSubmit, product }: any) => {
 
   const [form, setForm] = useState(initialForm);
   const isEdit = !!product?.id;
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Load Asset Groups and Types
   useEffect(() => {
@@ -550,6 +565,12 @@ const ProductFormDialog = ({ open, onClose, onSubmit, product }: any) => {
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      if (name === "assetGroupId") delete next.assetTypeId;
+      return next;
+    });
     if (name === "assetGroupId") {
       setForm({ ...form, assetGroupId: Number(value), assetTypeId: 0 });
     } else if (name === "assetTypeId") {
@@ -567,7 +588,27 @@ const ProductFormDialog = ({ open, onClose, onSubmit, product }: any) => {
     (t) => t.assetGroupId === form.assetGroupId,
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const nextErrors: Record<string, string> = {};
+
+    if (!form.tagNo.trim()) nextErrors.tagNo = "Tag No is required";
+    if (!form.assetGroupId) nextErrors.assetGroupId = "Asset Group is required";
+    if (!form.assetTypeId) nextErrors.assetTypeId = "Asset Type is required";
+    if (!form.stockedAt) nextErrors.stockedAt = "Stocked At is required";
+    if (!form.brand.trim()) nextErrors.brand = "Brand is required";
+
+    const costTrimmed = form.cost.toString().trim();
+    const costValue = Number(form.cost);
+    // Keep cost optional: the existing submit payload doesn't append it yet.
+    if (costTrimmed && (Number.isNaN(costValue) || costValue < 0)) {
+      nextErrors.cost = "Enter a valid cost";
+    }
+
+    if (!form.serialNo.trim()) nextErrors.serialNo = "Serial No is required";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     const data = new FormData();
     data.append("tagNo", form.tagNo);
     data.append("assetGroupId", form.assetGroupId.toString());
@@ -576,109 +617,194 @@ const ProductFormDialog = ({ open, onClose, onSubmit, product }: any) => {
     data.append("brand", form.brand);
     data.append("serialNo", form.serialNo);
     if (form.imageFile) data.append("Image", form.imageFile);
-    onSubmit(data);
+
+    // Submit flow stays in parent; we only handle UI loading/disable here.
+    setSubmitting(true);
+    try {
+      await onSubmit(data);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>{isEdit ? "Edit Product" : "Create Product"}</DialogTitle>
-      <DialogContent>
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Tag No"
-          name="tagNo"
-          value={form.tagNo}
-          onChange={handleChange}
-        />
+      <DialogTitle>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+          {isEdit ? "Edit Product" : "Create Product"}
+        </Typography>
+      </DialogTitle>
 
-        <TextField
-          select
-          fullWidth
-          margin="normal"
-          label="Asset Group"
-          name="assetGroupId"
-          value={form.assetGroupId}
-          onChange={handleChange}
-        >
-          {groups.map((g) => (
-            <MenuItem key={g.id} value={g.id}>
-              {g.groupName}
-            </MenuItem>
-          ))}
-        </TextField>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Tag No"
+              name="tagNo"
+              value={form.tagNo}
+              onChange={handleChange}
+              error={Boolean(errors.tagNo)}
+              helperText={errors.tagNo}
+              required
+            />
 
-        <TextField
-          select
-          fullWidth
-          margin="normal"
-          label="Asset Type"
-          name="assetTypeId"
-          value={form.assetTypeId}
-          onChange={handleChange}
-        >
-          {filteredTypes.map((t) => (
-            <MenuItem key={t.id} value={t.id}>
-              {t.typeName}
-            </MenuItem>
-          ))}
-        </TextField>
+            <TextField
+              select
+              fullWidth
+              margin="dense"
+              label="Asset Group"
+              name="assetGroupId"
+              value={form.assetGroupId}
+              onChange={handleChange}
+              error={Boolean(errors.assetGroupId)}
+              helperText={errors.assetGroupId}
+              required
+            >
+              {groups.map((g) => (
+                <MenuItem key={g.id} value={g.id}>
+                  {g.groupName}
+                </MenuItem>
+              ))}
+            </TextField>
 
-        <TextField
-          fullWidth
-          margin="normal"
-          type="date"
-          label="Stocked At"
-          name="stockedAt"
-          InputLabelProps={{ shrink: true }}
-          value={form.stockedAt}
-          onChange={handleChange}
-        />
+            <TextField
+              select
+              fullWidth
+              margin="dense"
+              label="Asset Type"
+              name="assetTypeId"
+              value={form.assetTypeId}
+              onChange={handleChange}
+              error={Boolean(errors.assetTypeId)}
+              helperText={errors.assetTypeId}
+              required
+            >
+              {filteredTypes.map((t) => (
+                <MenuItem key={t.id} value={t.id}>
+                  {t.typeName}
+                </MenuItem>
+              ))}
+            </TextField>
 
-        <Box mt={2}>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-        </Box>
+            <TextField
+              fullWidth
+              margin="dense"
+              type="date"
+              label="Stocked At"
+              name="stockedAt"
+              InputLabelProps={{ shrink: true }}
+              value={form.stockedAt}
+              onChange={handleChange}
+              error={Boolean(errors.stockedAt)}
+              helperText={errors.stockedAt}
+              required
+            />
 
-        <Box mt={2}>
-          {form.imageFile && (
-            <img src={URL.createObjectURL(form.imageFile)} width={150} />
-          )}
-          {!form.imageFile && form.imagePath && (
-            <img src={`http://localhost:5055/${form.imagePath}`} width={150} />
-          )}
-        </Box>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Cost"
+              type="number"
+              name="cost"
+              value={form.cost}
+              onChange={handleChange}
+              error={Boolean(errors.cost)}
+              helperText={errors.cost}
+            />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Brand"
-          name="brand"
-          value={form.brand}
-          onChange={handleChange}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Cost"
-          type="number"
-          name="cost"
-          value={form.cost}
-          onChange={handleChange}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Serial No"
-          name="serialNo"
-          value={form.serialNo}
-          onChange={handleChange}
-        />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Brand"
+              name="brand"
+              value={form.brand}
+              onChange={handleChange}
+              error={Boolean(errors.brand)}
+              helperText={errors.brand}
+              required
+            />
+
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Serial No"
+              name="serialNo"
+              value={form.serialNo}
+              onChange={handleChange}
+              error={Boolean(errors.serialNo)}
+              helperText={errors.serialNo}
+              required
+            />
+
+            <Box sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", mb: 1 }}
+              >
+                Image (optional)
+              </Typography>
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              {form.imageFile && (
+                <Box
+                  sx={{
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <img
+                    src={URL.createObjectURL(form.imageFile)}
+                    width={150}
+                    style={{ display: "block", objectFit: "cover" }}
+                  />
+                </Box>
+              )}
+
+              {!form.imageFile && form.imagePath && (
+                <Box
+                  sx={{
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <img
+                    src={`http://localhost:5055/${form.imagePath}`}
+                    width={150}
+                    style={{ display: "block", objectFit: "cover" }}
+                  />
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Paper>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Save
+      <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
+        <Button onClick={onClose} disabled={submitting}>
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleSubmit} disabled={submitting}>
+          {submitting ? (
+            <CircularProgress size={18} sx={{ color: "common.white", mr: 1 }} />
+          ) : null}
+          {isEdit ? "Update" : "Save"}
         </Button>
       </DialogActions>
     </Dialog>

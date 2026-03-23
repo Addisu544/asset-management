@@ -6,6 +6,7 @@ import {
   Button,
   Typography,
   Box,
+  Paper,
 } from "@mui/material";
 
 interface Props {
@@ -19,15 +20,21 @@ const TransactionDetailsDialog = ({ open, onClose, transaction }: Props) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Transaction Details</DialogTitle>
+      <DialogTitle>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+          Transaction Details
+        </Typography>
+      </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5 }}>
         {/* ✅ IMAGE */}
         <Box display="flex" justifyContent="center" mb={2}>
           {transaction.productImagePath ? (
             <img
               src={`http://localhost:5055/${transaction.productImagePath}`}
               width="150"
+              style={{ borderRadius: 12, display: "block" }}
             />
           ) : (
             <Typography>No Image</Typography>
@@ -69,6 +76,7 @@ const TransactionDetailsDialog = ({ open, onClose, transaction }: Props) => {
         <Typography>
           <strong>Date:</strong> {transaction.createdAt}
         </Typography>
+        </Paper>
       </DialogContent>
 
       <DialogActions>

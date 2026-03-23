@@ -7,6 +7,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Paper,
+  CircularProgress,
 } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
@@ -18,6 +20,8 @@ const AssetGroupsPage = () => {
   const [groups, setGroups] = useState([]);
   const [open, setOpen] = useState(false);
   const [groupName, setGroupName] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -35,6 +39,12 @@ const AssetGroupsPage = () => {
   }, []);
 
   const handleSave = async () => {
+    const nextErrors: Record<string, string> = {};
+    if (!groupName.trim()) nextErrors.groupName = "Group name is required";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setSaving(true);
     try {
       if (selected) {
         await assetGroupService.update(selected.id, { groupName });
@@ -47,9 +57,12 @@ const AssetGroupsPage = () => {
       setOpen(false);
       setSelected(null);
       setGroupName("");
+      setErrors({});
       fetchData();
     } catch (err) {
       showApiError(err, "Failed to save asset group");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -117,21 +130,38 @@ const AssetGroupsPage = () => {
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>{selected ? "Edit Group" : "Create Group"}</DialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <Paper variant="outlined" sx={{ p: 2.5 }}>
           <TextField
             fullWidth
             label="Group Name"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            sx={{ mt: 2 }}
+            margin="dense"
+            error={Boolean(errors.groupName)}
+            helperText={errors.groupName}
+            required
           />
+          </Paper>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
+          <Button onClick={() => setOpen(false)} disabled={saving}>
+            Cancel
+          </Button>
 
-          <Button variant="contained" onClick={handleSave}>
-            Save
+          <Button variant="contained" onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <CircularProgress
+                  size={18}
+                  sx={{ color: "common.white", mr: 1 }}
+                />
+                Saving...
+              </>
+            ) : (
+              "Save"
+            )}
           </Button>
         </DialogActions>
       </Dialog>

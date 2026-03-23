@@ -5,6 +5,7 @@ import {
   DialogActions,
   Button,
   Typography,
+  Paper,
 } from "@mui/material";
 
 interface Props {
@@ -18,13 +19,19 @@ interface Props {
 const ConfirmDialog = ({ open, title, message, onConfirm, onClose }: Props) => {
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+          {title}
+        </Typography>
+      </DialogTitle>
 
-      <DialogContent>
-        <Typography>{message}</Typography>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5 }}>
+          <Typography>{message}</Typography>
+        </Paper>
       </DialogContent>
 
-      <DialogActions>
+      <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
         <Button onClick={onClose}>Cancel</Button>
 
         <Button color="error" variant="contained" onClick={onConfirm}>

@@ -7,6 +7,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Paper,
+  CircularProgress,
 } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
@@ -18,6 +20,8 @@ const DepartmentsPage = () => {
   const [departments, setDepartments] = useState([]);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -35,6 +39,13 @@ const DepartmentsPage = () => {
   }, []);
 
   const handleSave = async () => {
+    const nextErrors: Record<string, string> = {};
+    if (!name.trim()) nextErrors.name = "Department name is required";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setSaving(true);
     try {
       if (selected) {
         await departmentService.update(selected.id, { name });
@@ -47,9 +58,12 @@ const DepartmentsPage = () => {
       setOpen(false);
       setSelected(null);
       setName("");
+      setErrors({});
       fetchData();
     } catch (err) {
       showApiError(err, "Failed to save department");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -119,21 +133,38 @@ const DepartmentsPage = () => {
           {selected ? "Edit Department" : "Create Department"}
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <Paper variant="outlined" sx={{ p: 2.5 }}>
           <TextField
             fullWidth
             label="Department Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            sx={{ mt: 2 }}
+            margin="dense"
+            error={Boolean(errors.name)}
+            helperText={errors.name}
+            required
           />
+          </Paper>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
+          <Button onClick={() => setOpen(false)} disabled={saving}>
+            Cancel
+          </Button>
 
-          <Button variant="contained" onClick={handleSave}>
-            Save
+          <Button variant="contained" onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <CircularProgress
+                  size={18}
+                  sx={{ color: "common.white", mr: 1 }}
+                />
+                Saving...
+              </>
+            ) : (
+              "Save"
+            )}
           </Button>
         </DialogActions>
       </Dialog>

@@ -76,6 +76,7 @@ import {
   Button,
   Typography,
   Box,
+  Paper,
 } from "@mui/material";
 import StatusBadge from "../../components/common/StatusBadge";
 import { Avatar } from "@mui/material";
@@ -90,10 +91,15 @@ const EmployeeDetailsDialog = ({ open, onClose, employee }: Props) => {
   if (!employee) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Employee Details</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+          Employee Details
+        </Typography>
+      </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5 }}>
         {/* ✅ IMAGE DISPLAY */}
         <Box display="flex" justifyContent="center" mb={2}>
           <Avatar
@@ -102,7 +108,14 @@ const EmployeeDetailsDialog = ({ open, onClose, employee }: Props) => {
                 ? `http://localhost:5055/${employee.imagePath}`
                 : ""
             }
-            sx={{ width: 120, height: 120, margin: "0 auto" }}
+            sx={{
+              width: 120,
+              height: 120,
+              margin: "0 auto",
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+            }}
           />
         </Box>
 
@@ -141,6 +154,7 @@ const EmployeeDetailsDialog = ({ open, onClose, employee }: Props) => {
         <Typography gutterBottom>
           <strong>Status:</strong> <StatusBadge status={employee.status} />
         </Typography>
+        </Paper>
       </DialogContent>
 
       <DialogActions>

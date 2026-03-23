@@ -8,6 +8,8 @@ import {
   DialogActions,
   TextField,
   MenuItem,
+  Paper,
+  CircularProgress,
 } from "@mui/material";
 
 import DataTable from "../../components/common/DataTable";
@@ -24,6 +26,8 @@ const AssetTypesPage = () => {
 
   const [typeName, setTypeName] = useState("");
   const [assetGroupId, setAssetGroupId] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<any>(null);
@@ -46,10 +50,19 @@ const AssetTypesPage = () => {
   }, []);
 
   const handleSave = async () => {
+    const nextErrors: Record<string, string> = {};
+    if (!typeName.trim()) nextErrors.typeName = "Type name is required";
+    if (!assetGroupId) nextErrors.assetGroupId = "Asset group is required";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     const body = {
       typeName,
       assetGroupId: Number(assetGroupId),
     };
+
+    setSaving(true);
     try {
       if (selected) {
         await assetTypeService.update(selected.id, body);
@@ -63,9 +76,12 @@ const AssetTypesPage = () => {
       setSelected(null);
       setTypeName("");
       setAssetGroupId("");
+      setErrors({});
       fetchData();
     } catch (err) {
       showApiError(err, "Failed to save asset type");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -140,13 +156,17 @@ const AssetTypesPage = () => {
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>{selected ? "Edit Type" : "Create Type"}</DialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <Paper variant="outlined" sx={{ p: 2.5 }}>
           <TextField
             fullWidth
             label="Type Name"
             value={typeName}
             onChange={(e) => setTypeName(e.target.value)}
-            sx={{ mt: 2 }}
+            margin="dense"
+            error={Boolean(errors.typeName)}
+            helperText={errors.typeName}
+            required
           />
 
           <TextField
@@ -155,7 +175,10 @@ const AssetTypesPage = () => {
             label="Asset Group"
             value={assetGroupId}
             onChange={(e) => setAssetGroupId(e.target.value)}
-            sx={{ mt: 2 }}
+            margin="dense"
+            error={Boolean(errors.assetGroupId)}
+            helperText={errors.assetGroupId}
+            required
           >
             {groups.map((g: any) => (
               <MenuItem key={g.id} value={g.id}>
@@ -163,13 +186,26 @@ const AssetTypesPage = () => {
               </MenuItem>
             ))}
           </TextField>
+          </Paper>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
+          <Button onClick={() => setOpen(false)} disabled={saving}>
+            Cancel
+          </Button>
 
-          <Button variant="contained" onClick={handleSave}>
-            Save
+          <Button variant="contained" onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <CircularProgress
+                  size={18}
+                  sx={{ color: "common.white", mr: 1 }}
+                />
+                Saving...
+              </>
+            ) : (
+              "Save"
+            )}
           </Button>
         </DialogActions>
       </Dialog>

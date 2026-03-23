@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Typography } from "@mui/material";
+import { TextField, Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
@@ -11,9 +11,17 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+
+    const nextErrors: Record<string, string> = {};
+    if (!email.trim()) nextErrors.email = "Email is required";
+    if (!password.trim()) nextErrors.password = "Password is required";
+
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
 
     try {
       setLoading(true);
@@ -30,26 +38,39 @@ const Login = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" sx={{ mt: 8 }}>
-        Login
-      </Typography>
+      <Paper variant="outlined" sx={{ mt: 8, p: 4 }}>
+        <Typography variant="h4" sx={{ mb: 3, fontWeight: 900 }}>
+          Login
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
           label="Email"
-          margin="normal"
+          margin="dense"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setFieldErrors((prev) => ({ ...prev, email: "" }));
+          }}
+          error={Boolean(fieldErrors.email)}
+          helperText={fieldErrors.email}
+          required
         />
 
         <TextField
           fullWidth
           type="password"
           label="Password"
-          margin="normal"
+          margin="dense"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setFieldErrors((prev) => ({ ...prev, password: "" }));
+          }}
+          error={Boolean(fieldErrors.password)}
+          helperText={fieldErrors.password}
+          required
         />
 
         {error && <Typography color="error">{error}</Typography>}
@@ -63,7 +84,8 @@ const Login = () => {
         >
           {loading ? "Logging in..." : "Login"}
         </Button>
-      </form>
+        </Box>
+      </Paper>
     </Container>
   );
 };

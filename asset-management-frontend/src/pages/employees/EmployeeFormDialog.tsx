@@ -260,6 +260,9 @@ import {
   TextField,
   Button,
   Box,
+  Paper,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { departmentService } from "../../services/departmentService";
@@ -267,7 +270,7 @@ import { departmentService } from "../../services/departmentService";
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormData) => Promise<any> | any;
   employee?: any;
 }
 
@@ -292,6 +295,8 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
   const [departments, setDepartments] = useState<any[]>([]);
 
   const isEdit = !!employee?.id;
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // ✅ RESET / PREFILL
   useEffect(() => {
@@ -328,6 +333,11 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
 
     setForm({
       ...form,
@@ -345,7 +355,30 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
   };
 
   // ✅ SUBMIT WITH FORMDATA
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const nextErrors: Record<string, string> = {};
+
+    if (!form.firstName.trim()) nextErrors.firstName = "First name is required";
+    if (!form.lastName.trim()) nextErrors.lastName = "Last name is required";
+
+    if (!form.email.trim()) nextErrors.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(form.email))
+      nextErrors.email = "Enter a valid email";
+
+    if (!form.userId.trim()) nextErrors.userId = "UserId is required";
+    if (!isEdit && !form.password.trim())
+      nextErrors.password = "Password is required";
+
+    if (!form.phone.trim()) nextErrors.phone = "Phone is required";
+    if (!form.title.trim()) nextErrors.title = "Title is required";
+    if (!form.level.trim()) nextErrors.level = "Level is required";
+    if (!form.departmentId) nextErrors.departmentId = "Department is required";
+    if (!form.role.trim()) nextErrors.role = "Role is required";
+    if (!form.status.trim()) nextErrors.status = "Status is required";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     const data = new FormData();
 
     data.append("FirstName", form.firstName);
@@ -367,164 +400,263 @@ const EmployeeFormDialog = ({ open, onClose, onSubmit, employee }: Props) => {
       data.append("Image", form.imageFile);
     }
 
-    onSubmit(data);
+    setSubmitting(true);
+    try {
+      await onSubmit(data);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>{isEdit ? "Edit Employee" : "Create Employee"}</DialogTitle>
+      <DialogTitle>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+          {isEdit ? "Edit Employee" : "Create Employee"}
+        </Typography>
+      </DialogTitle>
 
-      <DialogContent>
-        <TextField
-          fullWidth
-          margin="normal"
-          label="First Name"
-          name="firstName"
-          value={form.firstName}
-          onChange={handleChange}
-        />
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2.5 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="First Name"
+              name="firstName"
+              value={form.firstName}
+              onChange={handleChange}
+              error={Boolean(errors.firstName)}
+              helperText={errors.firstName}
+              required
+            />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Last Name"
-          name="lastName"
-          value={form.lastName}
-          onChange={handleChange}
-        />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Last Name"
+              name="lastName"
+              value={form.lastName}
+              onChange={handleChange}
+              error={Boolean(errors.lastName)}
+              helperText={errors.lastName}
+              required
+            />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-        />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              error={Boolean(errors.email)}
+              helperText={errors.email}
+              required
+            />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="UserId"
-          name="userId"
-          value={form.userId}
-          onChange={handleChange}
-        />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="UserId"
+              name="userId"
+              value={form.userId}
+              onChange={handleChange}
+              error={Boolean(errors.userId)}
+              helperText={errors.userId}
+              required
+            />
 
-        {!isEdit && (
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-          />
-        )}
+            {!isEdit && (
+              <TextField
+                fullWidth
+                margin="dense"
+                label="Password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                type="password"
+                error={Boolean(errors.password)}
+                helperText={errors.password}
+                required
+              />
+            )}
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Phone"
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-        />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Phone"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              error={Boolean(errors.phone)}
+              helperText={errors.phone}
+              required
+            />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Title"
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-        />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Title"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              error={Boolean(errors.title)}
+              helperText={errors.title}
+              required
+            />
 
-        <TextField
-          select
-          fullWidth
-          margin="normal"
-          label="Level"
-          name="level"
-          value={form.level}
-          onChange={handleChange}
-          SelectProps={{ native: true }}
-        >
-          <option value=""></option>
-          <option value="Junior">Junior</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Senior">Senior</option>
-        </TextField>
+            <TextField
+              select
+              fullWidth
+              margin="dense"
+              label="Level"
+              name="level"
+              value={form.level}
+              onChange={handleChange}
+              SelectProps={{ native: true }}
+              error={Boolean(errors.level)}
+              helperText={errors.level}
+              required
+            >
+              <option value=""></option>
+              <option value="Junior">Junior</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Senior">Senior</option>
+            </TextField>
 
-        <TextField
-          select
-          fullWidth
-          margin="normal"
-          label="Department"
-          name="departmentId"
-          value={form.departmentId}
-          onChange={handleChange}
-          SelectProps={{ native: true }}
-        >
-          <option value=""></option>
-          {departments.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </TextField>
+            <TextField
+              select
+              fullWidth
+              margin="dense"
+              label="Department"
+              name="departmentId"
+              value={form.departmentId}
+              onChange={handleChange}
+              SelectProps={{ native: true }}
+              error={Boolean(errors.departmentId)}
+              helperText={errors.departmentId}
+              required
+            >
+              <option value=""></option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </TextField>
 
-        <TextField
-          select
-          fullWidth
-          margin="normal"
-          label="Role"
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          SelectProps={{ native: true }}
-        >
-          <option value=""></option>
-          <option value="Employee">Employee</option>
-          <option value="Manager">Manager</option>
-          <option value="AssetManager">AssetManager</option>
-        </TextField>
+            <TextField
+              select
+              fullWidth
+              margin="dense"
+              label="Role"
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              SelectProps={{ native: true }}
+              error={Boolean(errors.role)}
+              helperText={errors.role}
+              required
+            >
+              <option value=""></option>
+              <option value="Employee">Employee</option>
+              <option value="Manager">Manager</option>
+              <option value="AssetManager">AssetManager</option>
+            </TextField>
 
-        <TextField
-          select
-          fullWidth
-          margin="normal"
-          label="Status"
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-          SelectProps={{ native: true }}
-        >
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </TextField>
+            <TextField
+              select
+              fullWidth
+              margin="dense"
+              label="Status"
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              SelectProps={{ native: true }}
+              error={Boolean(errors.status)}
+              helperText={errors.status}
+              required
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </TextField>
 
-        {/* ✅ IMAGE INPUT */}
-        <Box mt={2}>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-        </Box>
+            <Box sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", mb: 1 }}
+              >
+                Image (optional)
+              </Typography>
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+            </Box>
 
-        {/* ✅ IMAGE PREVIEW */}
-        <Box mt={2}>
-          {form.imageFile && (
-            <img src={URL.createObjectURL(form.imageFile)} width={120} />
-          )}
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              {form.imageFile && (
+                <Box
+                  sx={{
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <img
+                    src={URL.createObjectURL(form.imageFile)}
+                    width={120}
+                    style={{ display: "block", objectFit: "cover" }}
+                  />
+                </Box>
+              )}
 
-          {!form.imageFile && form.imagePath && (
-            <img src={`http://localhost:5055/${form.imagePath}`} width={120} />
-          )}
-        </Box>
+              {!form.imageFile && form.imagePath && (
+                <Box
+                  sx={{
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <img
+                    src={`http://localhost:5055/${form.imagePath}`}
+                    width={120}
+                    style={{ display: "block", objectFit: "cover" }}
+                  />
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Paper>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Save
+      <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
+        <Button onClick={onClose} disabled={submitting}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <CircularProgress size={18} sx={{ color: "common.white", mr: 1 }} />
+              Saving...
+            </>
+          ) : (
+            "Save"
+          )}
         </Button>
       </DialogActions>
     </Dialog>
