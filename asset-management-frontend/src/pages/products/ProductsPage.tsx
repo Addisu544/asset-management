@@ -7,9 +7,11 @@ import { productService } from "../../services/productService";
 import ProductFormDialog from "./ProductFormDialog";
 import ProductDetailsDialog from "./ProductDetailsDialog";
 import { useAuth } from "../../context/AuthContext";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 const ProductsPage = () => {
   const { currentUser } = useAuth();
+  const { showSuccess, showApiError } = useSnackbar();
 
   const [products, setProducts] = useState([]);
 
@@ -20,8 +22,12 @@ const ProductsPage = () => {
   const [selected, setSelected] = useState<any>(null);
 
   const fetchProducts = async () => {
-    const res = await productService.getAll();
-    setProducts(res.data);
+    try {
+      const res = await productService.getAll();
+      setProducts(res.data);
+    } catch (err) {
+      showApiError(err, "Failed to load products");
+    }
   };
 
   useEffect(() => {
@@ -29,21 +35,38 @@ const ProductsPage = () => {
   }, []);
 
   const handleCreate = async (data: any) => {
-    await productService.create(data);
-    setOpenForm(false);
-    fetchProducts();
+    try {
+      await productService.create(data);
+      setOpenForm(false);
+      showSuccess("Product created successfully");
+      fetchProducts();
+    } catch (err) {
+      showApiError(err, "Failed to create product");
+    }
   };
 
   const handleUpdate = async (data: any) => {
-    await productService.update(selected.id, data);
-    setOpenForm(false);
-    fetchProducts();
+    try {
+      if (!selected) return;
+      await productService.update(selected.id, data);
+      setOpenForm(false);
+      showSuccess("Product updated successfully");
+      fetchProducts();
+    } catch (err) {
+      showApiError(err, "Failed to update product");
+    }
   };
 
   const handleDelete = async () => {
-    await productService.delete(selected.id);
-    setConfirmOpen(false);
-    fetchProducts();
+    try {
+      if (!selected) return;
+      await productService.delete(selected.id);
+      setConfirmOpen(false);
+      showSuccess("Product deleted successfully");
+      fetchProducts();
+    } catch (err) {
+      showApiError(err, "Failed to delete product");
+    }
   };
 
   const columns = [

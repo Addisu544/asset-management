@@ -15,8 +15,10 @@ import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 import { assetTypeService } from "../../services/assetTypeService";
 import { assetGroupService } from "../../services/assetGroupService";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 const AssetTypesPage = () => {
+  const { showSuccess, showApiError } = useSnackbar();
   const [types, setTypes] = useState([]);
   const [groups, setGroups] = useState([]);
 
@@ -28,11 +30,15 @@ const AssetTypesPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const fetchData = async () => {
-    const typesRes = await assetTypeService.getAll();
-    const groupsRes = await assetGroupService.getAll();
+    try {
+      const typesRes = await assetTypeService.getAll();
+      const groupsRes = await assetGroupService.getAll();
 
-    setTypes(typesRes.data);
-    setGroups(groupsRes.data);
+      setTypes(typesRes.data);
+      setGroups(groupsRes.data);
+    } catch (err) {
+      showApiError(err, "Failed to load asset types");
+    }
   };
 
   useEffect(() => {
@@ -44,21 +50,35 @@ const AssetTypesPage = () => {
       typeName,
       assetGroupId: Number(assetGroupId),
     };
+    try {
+      if (selected) {
+        await assetTypeService.update(selected.id, body);
+        showSuccess("Asset type updated successfully");
+      } else {
+        await assetTypeService.create(body);
+        showSuccess("Asset type created successfully");
+      }
 
-    if (selected) await assetTypeService.update(selected.id, body);
-    else await assetTypeService.create(body);
-
-    setOpen(false);
-    setSelected(null);
-    setTypeName("");
-    setAssetGroupId("");
-    fetchData();
+      setOpen(false);
+      setSelected(null);
+      setTypeName("");
+      setAssetGroupId("");
+      fetchData();
+    } catch (err) {
+      showApiError(err, "Failed to save asset type");
+    }
   };
 
   const handleDelete = async () => {
-    await assetTypeService.delete(selected.id);
-    setConfirmOpen(false);
-    fetchData();
+    try {
+      if (!selected) return;
+      await assetTypeService.delete(selected.id);
+      setConfirmOpen(false);
+      showSuccess("Asset type deleted successfully");
+      fetchData();
+    } catch (err) {
+      showApiError(err, "Failed to delete asset type");
+    }
   };
 
   const columns = [

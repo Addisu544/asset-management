@@ -8,10 +8,17 @@ const MainLayout = ({ children }: any) => {
   const [open, setOpen] = useState(true);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        bgcolor: "background.default",
+      }}
+    >
       
       {/* 🔹 TOPBAR (FULL WIDTH) */}
-      <Topbar open={open} setOpen={setOpen} />
+      <Topbar />
 
       {/* 🔹 BODY */}
       <Box sx={{ display: "flex", flexGrow: 1 }}>
@@ -20,7 +27,7 @@ const MainLayout = ({ children }: any) => {
         <Sidebar open={open} setOpen={setOpen} />
 
         {/* Content */}
-        <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Box sx={{ flexGrow: 1, p: 3, overflow: "auto" }}>
           {children}
         </Box>
       </Box>

@@ -17,7 +17,6 @@ import TransactionPage from "../pages/transactions/TransactionPage";
 import ProfilePage from "../pages/user/ProfilePage";
 import MyTransactionsPage from "../pages/user/MyTransactionsPage";
 import MyPropertiesPage from "../pages/user/MyPropertiesPage";
-import MainLayout from "../components/layout/MainLayout";
 import LayoutWrapper from "../components/layout/LayoutWrapper";
 const AppRouter = () => {
   return (

@@ -8,9 +8,11 @@ import EmployeeDetailsDialog from "./EmployeeDetailsDialog";
 import { employeeService } from "../../services/employeeService";
 // import { useAuth } from "../../contexts/AuthContext";
 import { useAuth } from "../../context/AuthContext";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 const EmployeesPage = () => {
   const { currentUser } = useAuth();
+  const { showSuccess, showApiError } = useSnackbar();
 
   const [employees, setEmployees] = useState([]);
 
@@ -21,8 +23,12 @@ const EmployeesPage = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
 
   const fetchEmployees = async () => {
-    const res = await employeeService.getAll();
-    setEmployees(res.data);
+    try {
+      const res = await employeeService.getAll();
+      setEmployees(res.data);
+    } catch (err) {
+      showApiError(err, "Failed to load employees");
+    }
   };
 
   useEffect(() => {
@@ -30,25 +36,42 @@ const EmployeesPage = () => {
   }, []);
 
   const handleCreate = async (data: any) => {
-    await employeeService.create(data);
-    setOpenForm(false);
-    fetchEmployees();
+    try {
+      await employeeService.create(data);
+      setOpenForm(false);
+      showSuccess("Employee created successfully");
+      fetchEmployees();
+    } catch (err) {
+      showApiError(err, "Failed to create employee");
+    }
   };
 
   const handleUpdate = async (data: any) => {
-    await employeeService.update(selectedEmployee.id, data);
-    setOpenForm(false);
-    fetchEmployees();
+    try {
+      if (!selectedEmployee) return;
+      await employeeService.update(selectedEmployee.id, data);
+      setOpenForm(false);
+      showSuccess("Employee updated successfully");
+      fetchEmployees();
+    } catch (err) {
+      showApiError(err, "Failed to update employee");
+    }
   };
   const handleToggleStatus = async () => {
     if (!selectedEmployee) return;
     const newStatus =
       selectedEmployee.status === "Active" ? "Inactive" : "Active";
-    await employeeService.changeStatus(selectedEmployee.id, {
-      status: newStatus,
-    });
-    setConfirmOpen(false);
-    fetchEmployees();
+
+    try {
+      await employeeService.changeStatus(selectedEmployee.id, {
+        status: newStatus,
+      });
+      setConfirmOpen(false);
+      showSuccess(`Employee status updated to ${newStatus}`);
+      fetchEmployees();
+    } catch (err) {
+      showApiError(err, "Failed to update employee status");
+    }
   };
 
   // 🔹 Columns definition

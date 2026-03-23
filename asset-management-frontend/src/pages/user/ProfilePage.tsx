@@ -21,7 +21,7 @@ const ProfilePage = () => {
   if (!profile) return null;
 
   return (
-    <Paper sx={{ p: 4, maxWidth: 600 }}>
+    <Paper sx={{ p: 3, maxWidth: 600 }}>
       <Typography variant="h5" gutterBottom>
         My Profile
       </Typography>

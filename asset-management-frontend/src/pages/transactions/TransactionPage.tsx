@@ -7,9 +7,11 @@ import ReturnProductDialog from "./ReturnProductDialog";
 import { transactionService } from "../../services/transactionService";
 import { useAuth } from "../../context/AuthContext";
 import TransactionDetailsDialog from "./TransactionDetailsDialog";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 const MyTransactionsPage = () => {
   const { currentUser } = useAuth();
+  const { showSuccess, showApiError } = useSnackbar();
 
   const [transactions, setTransactions] = useState([]);
 
@@ -17,8 +19,12 @@ const MyTransactionsPage = () => {
   const [openReturn, setOpenReturn] = useState(false);
 
   const fetchTransactions = async () => {
-    const res = await transactionService.getAll();
-    setTransactions(res.data);
+    try {
+      const res = await transactionService.getAll();
+      setTransactions(res.data);
+    } catch (err) {
+      showApiError(err, "Failed to load transactions");
+    }
   };
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [openView, setOpenView] = useState(false);
@@ -27,15 +33,25 @@ const MyTransactionsPage = () => {
   }, []);
 
   const handleIssue = async (data: any) => {
-    await transactionService.issueProduct(data);
-    setOpenIssue(false);
-    fetchTransactions();
+    try {
+      await transactionService.issueProduct(data);
+      setOpenIssue(false);
+      showSuccess("Product issued successfully");
+      fetchTransactions();
+    } catch (err) {
+      showApiError(err, "Failed to issue product");
+    }
   };
 
   const handleReturn = async (data: any) => {
-    await transactionService.returnProduct(data);
-    setOpenReturn(false);
-    fetchTransactions();
+    try {
+      await transactionService.returnProduct(data);
+      setOpenReturn(false);
+      showSuccess("Product returned successfully");
+      fetchTransactions();
+    } catch (err) {
+      showApiError(err, "Failed to return product");
+    }
   };
 
   const columns = [

@@ -11,8 +11,10 @@ import {
 import DataTable from "../../components/common/DataTable";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { departmentService } from "../../services/departmentService";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 const DepartmentsPage = () => {
+  const { showSuccess, showApiError } = useSnackbar();
   const [departments, setDepartments] = useState([]);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -20,8 +22,12 @@ const DepartmentsPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const fetchData = async () => {
-    const res = await departmentService.getAll();
-    setDepartments(res.data);
+    try {
+      const res = await departmentService.getAll();
+      setDepartments(res.data);
+    } catch (err) {
+      showApiError(err, "Failed to load departments");
+    }
   };
 
   useEffect(() => {
@@ -29,19 +35,34 @@ const DepartmentsPage = () => {
   }, []);
 
   const handleSave = async () => {
-    if (selected) await departmentService.update(selected.id, { name });
-    else await departmentService.create({ name });
+    try {
+      if (selected) {
+        await departmentService.update(selected.id, { name });
+        showSuccess("Department updated successfully");
+      } else {
+        await departmentService.create({ name });
+        showSuccess("Department created successfully");
+      }
 
-    setOpen(false);
-    setSelected(null);
-    setName("");
-    fetchData();
+      setOpen(false);
+      setSelected(null);
+      setName("");
+      fetchData();
+    } catch (err) {
+      showApiError(err, "Failed to save department");
+    }
   };
 
   const handleDelete = async () => {
-    await departmentService.delete(selected.id);
-    setConfirmOpen(false);
-    fetchData();
+    try {
+      if (!selected) return;
+      await departmentService.delete(selected.id);
+      setConfirmOpen(false);
+      showSuccess("Department deleted successfully");
+      fetchData();
+    } catch (err) {
+      showApiError(err, "Failed to delete department");
+    }
   };
 
   const columns = [

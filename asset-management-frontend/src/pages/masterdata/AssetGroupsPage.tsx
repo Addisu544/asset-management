@@ -11,8 +11,10 @@ import {
 import DataTable from "../../components/common/DataTable";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { assetGroupService } from "../../services/assetGroupService";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 const AssetGroupsPage = () => {
+  const { showSuccess, showApiError } = useSnackbar();
   const [groups, setGroups] = useState([]);
   const [open, setOpen] = useState(false);
   const [groupName, setGroupName] = useState("");
@@ -20,8 +22,12 @@ const AssetGroupsPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const fetchData = async () => {
-    const res = await assetGroupService.getAll();
-    setGroups(res.data);
+    try {
+      const res = await assetGroupService.getAll();
+      setGroups(res.data);
+    } catch (err) {
+      showApiError(err, "Failed to load asset groups");
+    }
   };
 
   useEffect(() => {
@@ -29,19 +35,34 @@ const AssetGroupsPage = () => {
   }, []);
 
   const handleSave = async () => {
-    if (selected) await assetGroupService.update(selected.id, { groupName });
-    else await assetGroupService.create({ groupName });
+    try {
+      if (selected) {
+        await assetGroupService.update(selected.id, { groupName });
+        showSuccess("Asset group updated successfully");
+      } else {
+        await assetGroupService.create({ groupName });
+        showSuccess("Asset group created successfully");
+      }
 
-    setOpen(false);
-    setSelected(null);
-    setGroupName("");
-    fetchData();
+      setOpen(false);
+      setSelected(null);
+      setGroupName("");
+      fetchData();
+    } catch (err) {
+      showApiError(err, "Failed to save asset group");
+    }
   };
 
   const handleDelete = async () => {
-    await assetGroupService.delete(selected.id);
-    setConfirmOpen(false);
-    fetchData();
+    try {
+      if (!selected) return;
+      await assetGroupService.delete(selected.id);
+      setConfirmOpen(false);
+      showSuccess("Asset group deleted successfully");
+      fetchData();
+    } catch (err) {
+      showApiError(err, "Failed to delete asset group");
+    }
   };
 
   const columns = [
