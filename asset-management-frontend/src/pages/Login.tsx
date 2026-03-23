@@ -37,7 +37,12 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container   maxWidth="sm" 
+  sx={{ 
+    minHeight: "75vh", 
+    display: "flex", 
+    alignItems: "center" 
+  }}>
       <Paper variant="outlined" sx={{ mt: 8, p: 4 }}>
         <Typography variant="h4" sx={{ mb: 3, fontWeight: 900 }}>
           Login
