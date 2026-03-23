@@ -10,6 +10,8 @@ import {
   MenuItem,
   Paper,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 
 import DataTable from "../../components/common/DataTable";
@@ -18,6 +20,8 @@ import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { assetTypeService } from "../../services/assetTypeService";
 import { assetGroupService } from "../../services/assetGroupService";
 import { useSnackbar } from "../../context/SnackbarContext";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const AssetTypesPage = () => {
   const { showSuccess, showApiError } = useSnackbar();
@@ -32,6 +36,7 @@ const AssetTypesPage = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -88,12 +93,15 @@ const AssetTypesPage = () => {
   const handleDelete = async () => {
     try {
       if (!selected) return;
+      setConfirmLoading(true);
       await assetTypeService.delete(selected.id);
       setConfirmOpen(false);
       showSuccess("Asset type deleted successfully");
       fetchData();
     } catch (err) {
       showApiError(err, "Failed to delete asset type");
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -116,29 +124,33 @@ const AssetTypesPage = () => {
         const row = params.row;
 
         return (
-          <Box>
-            <Button
-              size="small"
-              onClick={() => {
-                setSelected(row);
-                setTypeName(row.typeName);
-                setAssetGroupId(row.assetGroupId);
-                setOpen(true);
-              }}
-            >
-              Edit
-            </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title="Edit" arrow>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setSelected(row);
+                  setTypeName(row.typeName);
+                  setAssetGroupId(row.assetGroupId);
+                  setOpen(true);
+                }}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-            <Button
-              size="small"
-              color="error"
-              onClick={() => {
-                setSelected(row);
-                setConfirmOpen(true);
-              }}
-            >
-              Delete
-            </Button>
+            <Tooltip title="Delete" arrow>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => {
+                  setSelected(row);
+                  setConfirmOpen(true);
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       },
@@ -216,6 +228,7 @@ const AssetTypesPage = () => {
         message="Are you sure?"
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleDelete}
+        loading={confirmLoading}
       />
     </Box>
   );

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Button } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import StatusBadge from "../../components/common/StatusBadge";
 import { userService } from "../../services/userService";
 import { useAuth } from "../../context/AuthContext";
 import TransactionDetailsDialog from "../transactions/TransactionDetailsDialog";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const MyTransactionsPage = () => {
   const { currentUser } = useAuth();
@@ -54,15 +55,17 @@ const MyTransactionsPage = () => {
       headerName: "Actions",
       width: 120,
       renderCell: (params: any) => (
-        <Button
-          size="small"
-          onClick={() => {
-            setSelectedTransaction(params.row);
-            setOpenView(true);
-          }}
-        >
-          View
-        </Button>
+        <Tooltip title="View" arrow>
+          <IconButton
+            size="small"
+            onClick={() => {
+              setSelectedTransaction(params.row);
+              setOpenView(true);
+            }}
+          >
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       ),
     },
   ];

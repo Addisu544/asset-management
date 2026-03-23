@@ -6,6 +6,7 @@ import {
   Button,
   Typography,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 
 interface Props {
@@ -14,9 +15,17 @@ interface Props {
   message: string;
   onConfirm: () => void;
   onClose: () => void;
+  loading?: boolean;
 }
 
-const ConfirmDialog = ({ open, title, message, onConfirm, onClose }: Props) => {
+const ConfirmDialog = ({
+  open,
+  title,
+  message,
+  onConfirm,
+  onClose,
+  loading = false,
+}: Props) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
@@ -31,11 +40,30 @@ const ConfirmDialog = ({ open, title, message, onConfirm, onClose }: Props) => {
         </Paper>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}>
-        <Button onClick={onClose}>Cancel</Button>
+      <DialogActions
+        sx={{ px: 3, pb: 3, pt: 1, justifyContent: "space-between" }}
+      >
+        <Button onClick={onClose} disabled={loading}>
+          Cancel
+        </Button>
 
-        <Button color="error" variant="contained" onClick={onConfirm}>
-          Confirm
+        <Button
+          color="error"
+          variant="contained"
+          onClick={onConfirm}
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <CircularProgress
+                size={18}
+                sx={{ color: "common.white", mr: 1 }}
+              />
+              Confirming...
+            </>
+          ) : (
+            "Confirm"
+          )}
         </Button>
       </DialogActions>
     </Dialog>

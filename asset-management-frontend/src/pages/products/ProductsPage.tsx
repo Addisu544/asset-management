@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import StatusBadge from "../../components/common/StatusBadge";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
@@ -8,6 +8,9 @@ import ProductFormDialog from "./ProductFormDialog";
 import ProductDetailsDialog from "./ProductDetailsDialog";
 import { useAuth } from "../../context/AuthContext";
 import { useSnackbar } from "../../context/SnackbarContext";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ProductsPage = () => {
   const { currentUser } = useAuth();
@@ -18,6 +21,7 @@ const ProductsPage = () => {
   const [openForm, setOpenForm] = useState(false);
   const [openDetails, setOpenDetails] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [selected, setSelected] = useState<any>(null);
 
@@ -60,12 +64,15 @@ const ProductsPage = () => {
   const handleDelete = async () => {
     try {
       if (!selected) return;
+      setConfirmLoading(true);
       await productService.delete(selected.id);
       setConfirmOpen(false);
       showSuccess("Product deleted successfully");
       fetchProducts();
     } catch (err) {
       showApiError(err, "Failed to delete product");
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -93,39 +100,45 @@ const ProductsPage = () => {
         const row = params.row;
 
         return (
-          <Box>
-            <Button
-              size="small"
-              onClick={() => {
-                setSelected(row);
-                setOpenDetails(true);
-              }}
-            >
-              View
-            </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title="View" arrow>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setSelected(row);
+                  setOpenDetails(true);
+                }}
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
             {currentUser?.role === "AssetManager" && (
               <>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    setSelected(row);
-                    setOpenForm(true);
-                  }}
-                >
-                  Edit
-                </Button>
+                <Tooltip title="Edit" arrow>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setSelected(row);
+                      setOpenForm(true);
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
 
-                <Button
-                  size="small"
-                  color="error"
-                  onClick={() => {
-                    setSelected(row);
-                    setConfirmOpen(true);
-                  }}
-                >
-                  Delete
-                </Button>
+                <Tooltip title="Delete" arrow>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => {
+                      setSelected(row);
+                      setConfirmOpen(true);
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </>
             )}
           </Box>
@@ -170,6 +183,7 @@ const ProductsPage = () => {
         message="Are you sure?"
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleDelete}
+        loading={confirmLoading}
       />
     </Box>
   );

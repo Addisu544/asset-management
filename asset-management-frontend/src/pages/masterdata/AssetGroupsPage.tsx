@@ -9,11 +9,15 @@ import {
   TextField,
   Paper,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { assetGroupService } from "../../services/assetGroupService";
 import { useSnackbar } from "../../context/SnackbarContext";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const AssetGroupsPage = () => {
   const { showSuccess, showApiError } = useSnackbar();
@@ -24,6 +28,7 @@ const AssetGroupsPage = () => {
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -69,12 +74,15 @@ const AssetGroupsPage = () => {
   const handleDelete = async () => {
     try {
       if (!selected) return;
+      setConfirmLoading(true);
       await assetGroupService.delete(selected.id);
       setConfirmOpen(false);
       showSuccess("Asset group deleted successfully");
       fetchData();
     } catch (err) {
       showApiError(err, "Failed to delete asset group");
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -91,28 +99,32 @@ const AssetGroupsPage = () => {
         const row = params.row;
 
         return (
-          <Box>
-            <Button
-              size="small"
-              onClick={() => {
-                setSelected(row);
-                setGroupName(row.groupName);
-                setOpen(true);
-              }}
-            >
-              Edit
-            </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title="Edit" arrow>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setSelected(row);
+                  setGroupName(row.groupName);
+                  setOpen(true);
+                }}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-            <Button
-              size="small"
-              color="error"
-              onClick={() => {
-                setSelected(row);
-                setConfirmOpen(true);
-              }}
-            >
-              Delete
-            </Button>
+            <Tooltip title="Delete" arrow>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => {
+                  setSelected(row);
+                  setConfirmOpen(true);
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       },
@@ -172,6 +184,7 @@ const AssetGroupsPage = () => {
         message="Are you sure?"
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleDelete}
+        loading={confirmLoading}
       />
     </Box>
   );

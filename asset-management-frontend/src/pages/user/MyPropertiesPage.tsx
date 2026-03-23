@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Box, Button } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import StatusBadge from "../../components/common/StatusBadge";
 import { userService } from "../../services/userService";
 import ProductDetailsDialog from "../products/ProductDetailsDialog";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 console.log("reached above");
 
@@ -51,16 +52,18 @@ const MyPropertiesPage = () => {
         const row = params.row;
 
         return (
-          <Box>
-            <Button
-              size="small"
-              onClick={() => {
-                setSelected(row);
-                setOpenDetails(true);
-              }}
-            >
-              View
-            </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title="View" arrow>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setSelected(row);
+                  setOpenDetails(true);
+                }}
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       },

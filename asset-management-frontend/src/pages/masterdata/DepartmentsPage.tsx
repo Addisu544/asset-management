@@ -9,11 +9,15 @@ import {
   DialogActions,
   Paper,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { departmentService } from "../../services/departmentService";
 import { useSnackbar } from "../../context/SnackbarContext";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const DepartmentsPage = () => {
   const { showSuccess, showApiError } = useSnackbar();
@@ -24,6 +28,7 @@ const DepartmentsPage = () => {
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -70,12 +75,15 @@ const DepartmentsPage = () => {
   const handleDelete = async () => {
     try {
       if (!selected) return;
+      setConfirmLoading(true);
       await departmentService.delete(selected.id);
       setConfirmOpen(false);
       showSuccess("Department deleted successfully");
       fetchData();
     } catch (err) {
       showApiError(err, "Failed to delete department");
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -92,28 +100,32 @@ const DepartmentsPage = () => {
         const row = params.row;
 
         return (
-          <Box>
-            <Button
-              size="small"
-              onClick={() => {
-                setSelected(row);
-                setName(row.name);
-                setOpen(true);
-              }}
-            >
-              Edit
-            </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title="Edit" arrow>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setSelected(row);
+                  setName(row.name);
+                  setOpen(true);
+                }}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-            <Button
-              size="small"
-              color="error"
-              onClick={() => {
-                setSelected(row);
-                setConfirmOpen(true);
-              }}
-            >
-              Delete
-            </Button>
+            <Tooltip title="Delete" arrow>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => {
+                  setSelected(row);
+                  setConfirmOpen(true);
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       },
@@ -175,6 +187,7 @@ const DepartmentsPage = () => {
         message="Are you sure?"
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleDelete}
+        loading={confirmLoading}
       />
     </Box>
   );

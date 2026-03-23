@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Box, Avatar } from "@mui/material";
+import { Button, Box, Avatar, IconButton, Tooltip } from "@mui/material";
 import DataTable from "../../components/common/DataTable";
 import StatusBadge from "../../components/common/StatusBadge";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
@@ -9,6 +9,9 @@ import { employeeService } from "../../services/employeeService";
 // import { useAuth } from "../../contexts/AuthContext";
 import { useAuth } from "../../context/AuthContext";
 import { useSnackbar } from "../../context/SnackbarContext";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 
 const EmployeesPage = () => {
   const { currentUser } = useAuth();
@@ -19,6 +22,7 @@ const EmployeesPage = () => {
   const [openForm, setOpenForm] = useState(false);
   const [openDetails, setOpenDetails] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
 
@@ -63,6 +67,7 @@ const EmployeesPage = () => {
       selectedEmployee.status === "Active" ? "Inactive" : "Active";
 
     try {
+      setConfirmLoading(true);
       await employeeService.changeStatus(selectedEmployee.id, {
         status: newStatus,
       });
@@ -71,6 +76,8 @@ const EmployeesPage = () => {
       fetchEmployees();
     } catch (err) {
       showApiError(err, "Failed to update employee status");
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -124,39 +131,45 @@ const EmployeesPage = () => {
         const toggleColor = isActive ? "error" : "success";
 
         return (
-          <Box>
-            <Button
-              size="small"
-              onClick={() => {
-                setSelectedEmployee(employee);
-                setOpenDetails(true);
-              }}
-            >
-              View
-            </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Tooltip title="View" arrow>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setSelectedEmployee(employee);
+                  setOpenDetails(true);
+                }}
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
             {currentUser?.role === "AssetManager" && (
               <>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    setSelectedEmployee(employee);
-                    setOpenForm(true);
-                  }}
-                >
-                  Edit
-                </Button>
+                <Tooltip title="Edit" arrow>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setSelectedEmployee(employee);
+                      setOpenForm(true);
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
 
-                <Button
-                  size="small"
-                  color={toggleColor}
-                  onClick={() => {
-                    setSelectedEmployee(employee);
-                    setConfirmOpen(true);
-                  }}
-                >
-                  {toggleLabel}
-                </Button>
+                <Tooltip title={toggleLabel} arrow>
+                  <IconButton
+                    size="small"
+                    color={toggleColor}
+                    onClick={() => {
+                      setSelectedEmployee(employee);
+                      setConfirmOpen(true);
+                    }}
+                  >
+                    <PowerSettingsNewIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </>
             )}
           </Box>
@@ -219,6 +232,7 @@ const EmployeesPage = () => {
             : "Activate Employee"
         }
         message="Are you sure?"
+        loading={confirmLoading}
       />
     </Box>
   );
